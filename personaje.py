@@ -7,9 +7,27 @@ class Personaje(pygame.sprite.Sprite):
         self.velocidad = velocidad
         self.direccion = 1
         self.flip = False
-        self.img = pygame.image.load(f'img/{tipo}/parado/0.png')
-        self.img = pygame.transform.scale_by(self.img, scale)
-        self.rect = self.img.get_rect()
+        #animacion
+        self.animacion_lista = []
+        self.frame_indice = 0
+        self.accion = 0
+        self.tiempo_acto = pygame.time.get_ticks()
+        lista_temporal = []
+        for i in range(5):
+            img = pygame.image.load(f'img/{tipo}/parado/{i}.png')
+            img = pygame.transform.scale_by(img, scale)
+            lista_temporal.append(img)
+        self.animacion_lista.append(lista_temporal)
+        
+        lista_temporal = []
+        for i in range(6):
+            img = pygame.image.load(f'img/{tipo}/corriendo/{i}.png')
+            img = pygame.transform.scale_by(img, scale)
+            lista_temporal.append(img)
+        self.animacion_lista.append(lista_temporal)
+
+        self.imagen = self.animacion_lista[self.accion][self.frame_indice]
+        self.rect = self.imagen.get_rect()
         self.rect.center = (x, y)
 
     def movimiento(self, mov_izquierda, mov_derecha):
@@ -26,7 +44,22 @@ class Personaje(pygame.sprite.Sprite):
 
         self.rect.x += dx
         self.rect.y += dy
+    
+    def animacion(self):
+        RETRASO_ANIMACION = 100
+        self.imagen = self.animacion_lista[self.accion][self.frame_indice]
 
-    def dibujado(self,pantalla):
-        
-        pantalla.blit(pygame.transform.flip(self.img, self.flip, False), self.rect)
+        if pygame.time.get_ticks() - self.tiempo_acto > RETRASO_ANIMACION:
+            self.tiempo_acto = pygame.time.get_ticks()
+            self.frame_indice += 1
+            if self.frame_indice >= len(self.animacion_lista[self.accion]):
+                self.frame_indice = 0
+
+    def actualizar_accion(self, nueva_accion):
+        if nueva_accion != self.accion:
+            self.accion = nueva_accion
+            self.frame_indice = 0
+            self.tiempo_acto = pygame.time.get_ticks()
+
+    def dibujado(self,pantalla):   
+        pantalla.blit(pygame.transform.flip(self.imagen, self.flip, False), self.rect)

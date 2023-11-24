@@ -18,14 +18,21 @@ jugador_mov_derecha = False
 jugador = Personaje('jugador',200,200,2,5)
 
 
+
 #* bucle principal -----------------------------
 corriendo = True
 while corriendo:
     reloj.tick(FPS)
     pantalla.fill(COLOR_FONDO)
 
-    jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha)
+
+    jugador.animacion()
     jugador.dibujado(pantalla)
+    if jugador_mov_izquierda or jugador_mov_derecha:
+        jugador.actualizar_accion(1)
+    else:
+        jugador.actualizar_accion(0)
+    jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha)
 
 
     for evento in pygame.event.get():
