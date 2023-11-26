@@ -1,11 +1,20 @@
 import pygame
+import json
+
+with open("variables.json","r") as var:
+    variables = json.load(var)
+
+GRAVEDAD = variables["GRAVEDAD"]
 
 class Personaje(pygame.sprite.Sprite):
     def __init__(self, tipo, x, y,scale, velocidad):
         pygame.sprite.Sprite.__init__(self)
         self.tipo = tipo
+        self.vive = True
         self.velocidad = velocidad
         self.direccion = 1
+        self.velocidad_y = 0
+        self.salto = False
         self.flip = False
         #animacion
         self.animacion_lista = []
@@ -41,6 +50,18 @@ class Personaje(pygame.sprite.Sprite):
             dx += self.velocidad
             self.flip = False
             self.direccion = 1
+        
+        #salto
+        if self.salto == True:
+            self.velocidad_y = -11
+            self.salto = False
+        
+        #aplicamos gravedad
+        self.velocidad_y += GRAVEDAD
+        if self.velocidad_y >10:
+            self.velocidad_y
+        dy += self.velocidad_y
+        
 
         self.rect.x += dx
         self.rect.y += dy

@@ -1,0 +1,8 @@
+
+{
+    "GRAVEDAD": 0.75,
+    "ANCHO_PANTALLA": 800,
+    "ALTO_PANTALLA": 600,
+    "FPS":60,
+    "COLOR_FONDO": [144,201,120]
+}
