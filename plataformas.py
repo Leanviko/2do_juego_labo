@@ -12,6 +12,11 @@ ANCHO_PANTALLA = variables["ANCHO_PANTALLA"]
 ALTO_PANTALLA = variables["ALTO_PANTALLA"]
 FPS = variables["FPS"]
 COLOR_FONDO = variables["COLOR_FONDO"]
+ROJO = variables["ROJO"]
+
+def dibujo_piso():
+    pantalla.fill(COLOR_FONDO)
+    pygame.draw.line(pantalla, ROJO, (0, 300), (ANCHO_PANTALLA, 300))
 
 
 
@@ -28,7 +33,12 @@ jugador_mov_izquierda = False
 jugador_mov_derecha = False
 
 
-jugador = Personaje('jugador',200,300,2,5)
+#Grupos
+grupo_balas = pygame.sprite.Group()
+
+
+
+jugador = Personaje('jugador',200,200,2,5)
 
 
 
@@ -36,7 +46,7 @@ jugador = Personaje('jugador',200,300,2,5)
 corriendo = True
 while corriendo:
     reloj.tick(FPS)
-    pantalla.fill(COLOR_FONDO)
+    dibujo_piso()
 
 
     jugador.animacion()

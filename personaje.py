@@ -23,7 +23,7 @@ class Personaje(pygame.sprite.Sprite):
         self.tiempo_acto = pygame.time.get_ticks()
         lista_temporal = []
         for i in range(5):
-            img = pygame.image.load(f'img/{tipo}/parado/{i}.png')
+            img = pygame.image.load(f'img/{tipo}/parado/{i}.png').convert_alpha()
             img = pygame.transform.scale_by(img, scale)
             lista_temporal.append(img)
         self.animacion_lista.append(lista_temporal)
@@ -62,9 +62,14 @@ class Personaje(pygame.sprite.Sprite):
             self.velocidad_y
         dy += self.velocidad_y
         
-
+        #chequeamos colision con el suelo
+        if self.rect.bottom + dy > 300:
+            dy = 300 - self.rect.bottom
+        
         self.rect.x += dx
         self.rect.y += dy
+
+        
     
     def animacion(self):
         RETRASO_ANIMACION = 100
