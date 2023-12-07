@@ -1,5 +1,6 @@
 import pygame 
 from personaje import Personaje
+from balas import Bala
 import json
 
 with open("variables.json","r") as var:
@@ -31,6 +32,7 @@ GRAVEDAD = 0.75
 #variables jugador
 jugador_mov_izquierda = False
 jugador_mov_derecha = False
+disparar = False
 
 
 #Grupos
@@ -38,7 +40,8 @@ grupo_balas = pygame.sprite.Group()
 
 
 
-jugador = Personaje('jugador',200,200,2,5)
+jugador = Personaje('jugador',200,200,2,5,25)
+enemigo = Personaje('enemigo',400,265,2,5,25)
 
 
 
@@ -49,13 +52,25 @@ while corriendo:
     dibujo_piso()
 
 
-    jugador.animacion()
+    enemigo.update()
+    enemigo.dibujado(pantalla)
+    jugador.update()
     jugador.dibujado(pantalla)
+
+
+    #Actualizar y dibujar grupos
+    grupo_balas.update()
+    grupo_balas.draw(pantalla)
+
     if jugador.vive:
+        if disparar:
+            jugador.disparar(Bala, grupo_balas)
+        if jugador.en_aire:
+            jugador.actualizar_accion(2) #saltar
         if jugador_mov_izquierda or jugador_mov_derecha:
-            jugador.actualizar_accion(1)
+            jugador.actualizar_accion(1)#correr
         else:
-            jugador.actualizar_accion(0)
+            jugador.actualizar_accion(0)#estar parado
         jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha)
     
 
@@ -71,6 +86,8 @@ while corriendo:
                 jugador_mov_izquierda = True
             if evento.key == pygame.K_d:   
                 jugador_mov_derecha = True
+            if evento.key == pygame.K_SPACE:   
+                disparar = True
             if evento.key == pygame.K_w and jugador.vive:
                 jugador.salto = True 
             if evento.key == pygame.K_ESCAPE:
@@ -81,6 +98,8 @@ while corriendo:
                 jugador_mov_izquierda = False
             if evento.key == pygame.K_d:   
                 jugador_mov_derecha = False
+            if evento.key == pygame.K_SPACE:   
+                disparar = False
             
     
     pygame.display.update()

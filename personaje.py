@@ -7,15 +7,22 @@ with open("variables.json","r") as var:
 GRAVEDAD = variables["GRAVEDAD"]
 
 class Personaje(pygame.sprite.Sprite):
-    def __init__(self, tipo, x, y,scale, velocidad):
+    def __init__(self, tipo, x, y,scale, velocidad,municion):
         pygame.sprite.Sprite.__init__(self)
         self.tipo = tipo
         self.vive = True
         self.velocidad = velocidad
-        self.direccion = 1
+        #arma
+        self.municion = municion
+        self.municion_inicio = municion
+        self.cadencia_tiro = 0
+        #salto
         self.velocidad_y = 0
         self.salto = False
+        self.en_aire = False
+        #giro
         self.flip = False
+        self.direccion = 1
         #animacion
         self.animacion_lista = []
         self.frame_indice = 0
@@ -39,6 +46,13 @@ class Personaje(pygame.sprite.Sprite):
         self.rect = self.imagen.get_rect()
         self.rect.center = (x, y)
 
+    def update(self):
+        self.animacion()
+        #actualizar cadencia tiro
+        if self.cadencia_tiro > 0:
+            self.cadencia_tiro -= 1
+
+
     def movimiento(self, mov_izquierda, mov_derecha):
         dx = 0
         dy = 0
@@ -52,9 +66,10 @@ class Personaje(pygame.sprite.Sprite):
             self.direccion = 1
         
         #salto
-        if self.salto == True:
+        if self.salto == True and self.en_aire == False:
             self.velocidad_y = -11
             self.salto = False
+            self.en_aire = True
         
         #aplicamos gravedad
         self.velocidad_y += GRAVEDAD
@@ -65,21 +80,31 @@ class Personaje(pygame.sprite.Sprite):
         #chequeamos colision con el suelo
         if self.rect.bottom + dy > 300:
             dy = 300 - self.rect.bottom
+            self.en_aire = False
         
         self.rect.x += dx
         self.rect.y += dy
 
-        
+    def disparar(self, Bala, grupo_balas):
+        if self.cadencia_tiro == 0 and self.municion > 0:
+            self.cadencia_tiro = 20
+            bala = Bala(self.rect.centerx + (0.6* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion)
+            grupo_balas.add(bala)
+            #reducir municion
+            self.municion -=1
+            print(self.municion)
     
     def animacion(self):
         RETRASO_ANIMACION = 100
+        #actualiza imagen dependiento el tempo
         self.imagen = self.animacion_lista[self.accion][self.frame_indice]
-
+        #chequeamos si paso el suficiente tiempo
         if pygame.time.get_ticks() - self.tiempo_acto > RETRASO_ANIMACION:
             self.tiempo_acto = pygame.time.get_ticks()
             self.frame_indice += 1
-            if self.frame_indice >= len(self.animacion_lista[self.accion]):
-                self.frame_indice = 0
+        #si la animacion es correr volvera al inicio de la secuencia    
+        if self.frame_indice >= len(self.animacion_lista[self.accion]):
+            self.frame_indice = 0
 
     def actualizar_accion(self, nueva_accion):
         if nueva_accion != self.accion:
