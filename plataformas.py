@@ -40,8 +40,8 @@ grupo_balas = pygame.sprite.Group()
 
 
 
-jugador = Personaje('jugador',200,200,2,5,25)
-enemigo = Personaje('enemigo',400,265,2,5,25)
+jugador = Personaje('jugador',200,200,2,5,100,25)
+enemigo = Personaje('enemigo',400,265,2,5,50,25)
 
 
 
@@ -59,7 +59,8 @@ while corriendo:
 
 
     #Actualizar y dibujar grupos
-    grupo_balas.update()
+    grupo_balas.update(jugador,grupo_balas)
+    grupo_balas.update(enemigo,grupo_balas)
     grupo_balas.draw(pantalla)
 
     if jugador.vive:

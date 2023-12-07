@@ -15,10 +15,16 @@ class Bala(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direccion = direccion
 
-    def update(self):
+    def update(self,personaje,grupo_balas):
         #mover balas
         self.rect.x += (self.direccion * self.velocidad)
-        #chear si las balas salen de la pantalla
+        #chequear si las balas salen de la pantalla
         if self.rect.right < 0 or self.rect.left > ANCHO_PANTALLA:
             self.kill()
+        
+        if pygame.sprite.spritecollide(personaje, grupo_balas, False):
+            if personaje.vive:
+                personaje.salud -= 10
+                self.kill()
+        
         
