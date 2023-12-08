@@ -1,6 +1,6 @@
 import pygame 
 from personaje import Personaje
-from balas import Bala
+from armas import *
 import json
 
 with open("variables.json","r") as var:
@@ -33,15 +33,18 @@ GRAVEDAD = 0.75
 jugador_mov_izquierda = False
 jugador_mov_derecha = False
 disparar = False
+granada = False
+granada_fue_lanzada = False
 
 
 #Grupos
 grupo_balas = pygame.sprite.Group()
+grupo_granadas = pygame.sprite.Group()
 
 
 
-jugador = Personaje('jugador',200,200,2,5,100,25)
-enemigo = Personaje('enemigo',400,265,2,5,50,25)
+jugador = Personaje('jugador',200,200,2,5,100,25,5)
+enemigo = Personaje('enemigo',400,265,2,5,50,25,0)
 
 
 
@@ -52,20 +55,28 @@ while corriendo:
     dibujo_piso()
 
 
-    enemigo.update()
-    enemigo.dibujado(pantalla)
     jugador.update()
     jugador.dibujado(pantalla)
-
+    
+    enemigo.update()
+    enemigo.dibujado(pantalla)
 
     #Actualizar y dibujar grupos
     grupo_balas.update(jugador,grupo_balas)
     grupo_balas.update(enemigo,grupo_balas)
+    grupo_granadas.update()
     grupo_balas.draw(pantalla)
+    grupo_granadas.draw(pantalla)
 
     if jugador.vive:
         if disparar:
             jugador.disparar(Bala, grupo_balas)
+        elif granada and granada_fue_lanzada == False and jugador.granadas > 0:
+            granada = Granada(jugador.rect.centerx + (0.5*jugador.rect.size[0]*jugador.direccion),\
+            jugador.rect.top, jugador.direccion)#lanzar granadas
+            grupo_granadas.add(granada)
+            jugador.granadas -= 1
+            granada_fue_lanzada = True
         if jugador.en_aire:
             jugador.actualizar_accion(2) #saltar
         if jugador_mov_izquierda or jugador_mov_derecha:
@@ -89,6 +100,8 @@ while corriendo:
                 jugador_mov_derecha = True
             if evento.key == pygame.K_SPACE:   
                 disparar = True
+            if evento.key == pygame.K_g:   
+                granada = True
             if evento.key == pygame.K_w and jugador.vive:
                 jugador.salto = True 
             if evento.key == pygame.K_ESCAPE:
@@ -101,6 +114,9 @@ while corriendo:
                 jugador_mov_derecha = False
             if evento.key == pygame.K_SPACE:   
                 disparar = False
+            if evento.key == pygame.K_g:   
+                granada = False
+                granada_fue_lanzada = False
             
     
     pygame.display.update()

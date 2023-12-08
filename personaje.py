@@ -8,7 +8,7 @@ with open("variables.json","r") as var:
 GRAVEDAD = variables["GRAVEDAD"]
 
 class Personaje(pygame.sprite.Sprite):
-    def __init__(self, tipo, x, y, scale, velocidad, salud, municion):
+    def __init__(self, tipo, x, y, scale, velocidad, salud, municion, granadas):
         pygame.sprite.Sprite.__init__(self)
         self.tipo = tipo
         self.vive = True
@@ -19,6 +19,7 @@ class Personaje(pygame.sprite.Sprite):
         self.municion = municion
         self.municion_inicio = municion
         self.cadencia_tiro = 0
+        self.granadas = granadas
         #salto
         self.velocidad_y = 0
         self.salto = False
@@ -110,7 +111,11 @@ class Personaje(pygame.sprite.Sprite):
             self.frame_indice += 1
         #si la animacion es correr volvera al inicio de la secuencia    
         if self.frame_indice >= len(self.animacion_lista[self.accion]):
-            self.frame_indice = 0
+            #En el caso de la muerte se detiene en el ultimo frame
+            if self.accion == 3:
+                self.frame_indice = len(self.animacion_lista[self.accion])-1
+            else:
+                self.frame_indice = 0
 
     def actualizar_accion(self, nueva_accion):
         if nueva_accion != self.accion:
