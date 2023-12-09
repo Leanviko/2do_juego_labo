@@ -1,6 +1,8 @@
 import pygame 
 from personaje import Personaje
 from armas import *
+from items import *
+from informacion import *
 import json
 
 with open("variables.json","r") as var:
@@ -14,6 +16,7 @@ ALTO_PANTALLA = variables["ALTO_PANTALLA"]
 FPS = variables["FPS"]
 COLOR_FONDO = variables["COLOR_FONDO"]
 ROJO = variables["ROJO"]
+BLANCO = variables["BLANCO"]
 
 def dibujo_piso():
     pantalla.fill(COLOR_FONDO)
@@ -21,7 +24,10 @@ def dibujo_piso():
 
 
 
+
+
 pygame.init()
+pygame.font.init()
 pantalla = pygame.display.set_mode((ANCHO_PANTALLA,ALTO_PANTALLA))
 pygame.display.set_caption('2do juego')
 reloj = pygame.time.Clock()
@@ -37,17 +43,27 @@ granada = False
 granada_fue_lanzada = False
 
 
+
 #Grupos
 grupo_balas = pygame.sprite.Group()
 grupo_granadas = pygame.sprite.Group()
 grupo_explosiones = pygame.sprite.Group()
 grupo_enemigos = pygame.sprite.Group()
+grupo_cajas_items = pygame.sprite.Group()
+
+caja_salud = CajaItem('Salud', 300, 260)
+grupo_cajas_items.add(caja_salud)
+caja_municion = CajaItem('Municion', 400, 260)
+grupo_cajas_items.add(caja_municion)
+caja_granada = CajaItem('Granada', 600, 260)
+grupo_cajas_items.add(caja_granada)
+
 
 
 
 jugador = Personaje('jugador',200,200,2,5,100,25,5)
-enemigo = Personaje('enemigo',400,265,2,5,35,25,0)
-enemigo2 = Personaje('enemigo',500,265,2,5,35,25,0)
+enemigo = Personaje('enemigo',420,265,2,5,35,25,0)
+enemigo2 = Personaje('enemigo',510,265,2,5,35,25,0)
 grupo_enemigos.add(enemigo)
 grupo_enemigos.add(enemigo2)
 
@@ -58,6 +74,9 @@ corriendo = True
 while corriendo:
     reloj.tick(FPS)
     dibujo_piso()
+    #mostrar municion
+    dibujar_texto(pantalla, f'Municion {jugador.municion}', fuente, BLANCO, 10, 35)
+
 
 
     jugador.update()
@@ -66,15 +85,18 @@ while corriendo:
     for enemigo in grupo_enemigos:
         enemigo.update()
         enemigo.dibujado(pantalla)
+    
 
     #Actualizar y dibujar grupos
     grupo_balas.update(jugador,grupo_balas,grupo_enemigos)
     grupo_balas.update(enemigo,grupo_balas,grupo_enemigos)
     grupo_granadas.update(grupo_explosiones,grupo_enemigos)
     grupo_explosiones.update()
+    grupo_cajas_items.update(jugador)
     grupo_balas.draw(pantalla)
     grupo_granadas.draw(pantalla)
     grupo_explosiones.draw(pantalla)
+    grupo_cajas_items.draw(pantalla)
 
     if jugador.vive:
         if disparar:

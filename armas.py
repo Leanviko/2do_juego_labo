@@ -74,8 +74,8 @@ class Granada(pygame.sprite.Sprite):
 
             #radio de daño
             for enemigo in grupo_enemigos:
-                if abs(self.rect.centerx - enemigo.rect.centerx)< BLOQUE_TAMANIO *2 or \
-                    abs(self.rect.centery - enemigo.rect.centery)< BLOQUE_TAMANIO *2:
+                if abs(self.rect.centerx - enemigo.rect.centerx)< BLOQUE_TAMANIO //2 or \
+                    abs(self.rect.centery - enemigo.rect.centery)< BLOQUE_TAMANIO //2:
                     enemigo.salud -= 50
                     print(enemigo.salud)
 
