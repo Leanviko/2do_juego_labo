@@ -58,5 +58,20 @@ class Granada(pygame.sprite.Sprite):
         #actualizar posicion granada
         self.rect.centerx += dx
         self.rect.centery += dy
+
+class Explosion(pygame.sprite.Sprite):
+    def __init__(self,x,y,escala):
+        pygame.sprite.Sprite.__init__(self)
+
+        #animacion de explosion
+        self.imagenes_exp =[]
+        for num in range(1,6):
+            img = pygame.image.load(f'img/explosion/exp{num}.png').convert_alpha()
+            img = pygame.transform.scale_by(img,escala)
+            self.imagenes_exp.append(img)
         
-        
+        self.indice_frame = 0
+        self.image = imagenes_exp[self.indice_frame]
+        self.rect = self.image.get_rect()
+        self.contador = 0 #controlar animacion
+

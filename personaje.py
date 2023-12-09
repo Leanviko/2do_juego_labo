@@ -8,7 +8,7 @@ with open("variables.json","r") as var:
 GRAVEDAD = variables["GRAVEDAD"]
 
 class Personaje(pygame.sprite.Sprite):
-    def __init__(self, tipo, x, y, scale, velocidad, salud, municion, granadas):
+    def __init__(self, tipo, x, y, escala, velocidad, salud, municion, granadas):
         pygame.sprite.Sprite.__init__(self)
         self.tipo = tipo
         self.vive = True
@@ -41,7 +41,7 @@ class Personaje(pygame.sprite.Sprite):
             num_de_frames = len(os.listdir(f'img/{tipo}/{animacion}'))
             for i in range(num_de_frames):
                 img = pygame.image.load(f'img/{tipo}/{animacion}/{i}.png').convert_alpha()
-                img = pygame.transform.scale_by(img, scale)
+                img = pygame.transform.scale_by(img, escala)
                 lista_temporal.append(img)
             self.animacion_lista.append(lista_temporal)
         
