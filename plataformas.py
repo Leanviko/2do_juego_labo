@@ -40,11 +40,16 @@ granada_fue_lanzada = False
 #Grupos
 grupo_balas = pygame.sprite.Group()
 grupo_granadas = pygame.sprite.Group()
+grupo_explosiones = pygame.sprite.Group()
+grupo_enemigos = pygame.sprite.Group()
 
 
 
 jugador = Personaje('jugador',200,200,2,5,100,25,5)
-enemigo = Personaje('enemigo',400,265,2,5,50,25,0)
+enemigo = Personaje('enemigo',400,265,2,5,35,25,0)
+enemigo2 = Personaje('enemigo',500,265,2,5,35,25,0)
+grupo_enemigos.add(enemigo)
+grupo_enemigos.add(enemigo2)
 
 
 
@@ -58,15 +63,18 @@ while corriendo:
     jugador.update()
     jugador.dibujado(pantalla)
     
-    enemigo.update()
-    enemigo.dibujado(pantalla)
+    for enemigo in grupo_enemigos:
+        enemigo.update()
+        enemigo.dibujado(pantalla)
 
     #Actualizar y dibujar grupos
-    grupo_balas.update(jugador,grupo_balas)
-    grupo_balas.update(enemigo,grupo_balas)
-    grupo_granadas.update()
+    grupo_balas.update(jugador,grupo_balas,grupo_enemigos)
+    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos)
+    grupo_granadas.update(grupo_explosiones,grupo_enemigos)
+    grupo_explosiones.update()
     grupo_balas.draw(pantalla)
     grupo_granadas.draw(pantalla)
+    grupo_explosiones.draw(pantalla)
 
     if jugador.vive:
         if disparar:
