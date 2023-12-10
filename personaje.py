@@ -1,11 +1,13 @@
 import pygame
 import json
 import os
+import random
 
 with open("variables.json","r") as var:
     variables = json.load(var)
 
 GRAVEDAD = variables["GRAVEDAD"]
+BLOQUE_TAMANIO = variables["BLOQUE_TAMANIO"]
 
 class Personaje(pygame.sprite.Sprite):
     def __init__(self, tipo, x, y, escala, velocidad, salud, municion, granadas):
@@ -32,6 +34,11 @@ class Personaje(pygame.sprite.Sprite):
         self.frame_indice = 0
         self.accion = 0
         self.tiempo_acto = pygame.time.get_ticks()
+        
+        #variables para ia
+        self.contador_movimiento = 0
+        self.pausa_movimiento = False
+        self.contador_pausa_movimiento = 0
         
         #cargando todos los tipos de imagen
         animacion_tipos =['parado','corriendo','salto','muerte']
@@ -100,6 +107,38 @@ class Personaje(pygame.sprite.Sprite):
             grupo_balas.add(bala)
             #reducir municion
             self.municion -=1
+
+    def ia(self, jugador):
+        if self.vive and jugador.vive:
+
+            #detenerse aleatoriamente
+            if self.pausa_movimiento == False and random.randint(1,200) == 1:
+                self.actualizar_accion(0)#parado
+                self.pausa_movimiento = True
+                self.contador_pausa_movimiento = 50
+
+            if self.pausa_movimiento == False:  
+                if self.direccion == 1:
+                    ia_mover_derecha = True
+                else:
+                    ia_mover_derecha = False
+                
+                #evitamos que la ia quiera moverse a ambos lados
+                ia_mover_izquierda = not ia_mover_derecha
+
+                self.movimiento(ia_mover_izquierda, ia_mover_derecha)
+                self.actualizar_accion(1)#correr
+                
+                self.contador_movimiento += 1 #pasos hasta que de la vuelta
+                if self.contador_movimiento > BLOQUE_TAMANIO:
+                    self.direccion *= -1
+                    self.contador_movimiento = 0
+            else:
+                self.contador_pausa_movimiento -= 1
+                if self.contador_pausa_movimiento <= 0:
+                    self.pausa_movimiento = False
+
+
     
     def animacion(self):
         RETRASO_ANIMACION = 100

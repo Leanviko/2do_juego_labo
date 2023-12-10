@@ -62,10 +62,10 @@ grupo_cajas_items.add(caja_granada)
 
 
 
-jugador = Personaje('jugador',200,200,2,5,100,25,5)
+jugador = Personaje('jugador',200,200,1.7,5,100,25,5)
 caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
-enemigo = Personaje('enemigo',420,265,2,5,35,25,0)
-enemigo2 = Personaje('enemigo',510,265,2,5,35,25,0)
+enemigo = Personaje('enemigo',420,200,1.7,2,35,25,0)
+enemigo2 = Personaje('enemigo',510,200,1.7,2,35,25,0)
 grupo_enemigos.add(enemigo)
 grupo_enemigos.add(enemigo2)
 
@@ -95,6 +95,7 @@ while corriendo:
     jugador.dibujado(pantalla)
     
     for enemigo in grupo_enemigos:
+        enemigo.ia(jugador)
         enemigo.update()
         enemigo.dibujado(pantalla)
     

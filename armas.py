@@ -28,7 +28,7 @@ class Bala(pygame.sprite.Sprite):
         
         for enemigo in grupo_enemigos:
             if pygame.sprite.spritecollide(enemigo, grupo_balas, False):
-                if personaje.vive:
+                if enemigo.vive:
                     enemigo.salud -= 10
                     self.kill()
 
