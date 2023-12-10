@@ -45,7 +45,7 @@ class Granada(pygame.sprite.Sprite):
         self.direccion = direccion
         
     
-    def update(self,grupo_explosiones,grupo_enemigos):
+    def update(self,grupo_explosiones,grupo_enemigos,jugador):
         self.velocidad_y += GRAVEDAD
         dy = self.velocidad_y
         dx = self.direccion * self.velocidad
@@ -73,11 +73,14 @@ class Granada(pygame.sprite.Sprite):
             grupo_explosiones.add(explosion)
 
             #radio de daño
+            if abs(self.rect.centerx - jugador.rect.centerx)< BLOQUE_TAMANIO //2 or \
+                    abs(self.rect.centery - jugador.rect.centery)< BLOQUE_TAMANIO //2:
+                    jugador.salud -= 25
+
             for enemigo in grupo_enemigos:
                 if abs(self.rect.centerx - enemigo.rect.centerx)< BLOQUE_TAMANIO //2 or \
                     abs(self.rect.centery - enemigo.rect.centery)< BLOQUE_TAMANIO //2:
                     enemigo.salud -= 50
-                    print(enemigo.salud)
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,x,y,escala):

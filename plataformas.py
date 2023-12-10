@@ -3,6 +3,7 @@ from personaje import Personaje
 from armas import *
 from items import *
 from informacion import *
+from salud import *
 import json
 
 with open("variables.json","r") as var:
@@ -62,6 +63,7 @@ grupo_cajas_items.add(caja_granada)
 
 
 jugador = Personaje('jugador',200,200,2,5,100,25,5)
+caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
 enemigo = Personaje('enemigo',420,265,2,5,35,25,0)
 enemigo2 = Personaje('enemigo',510,265,2,5,35,25,0)
 grupo_enemigos.add(enemigo)
@@ -74,8 +76,18 @@ corriendo = True
 while corriendo:
     reloj.tick(FPS)
     dibujo_piso()
-    #mostrar municion
-    dibujar_texto(pantalla, f'Municion {jugador.municion}', fuente, BLANCO, 10, 35)
+    
+    #mostrar salud/municion/granadas
+    caja_salud.dibujar(pantalla, jugador.salud)
+
+    dibujar_texto(pantalla, 'Municion: ', fuente, BLANCO, 10, 35)
+    for num_bala in range(jugador.municion):
+        pantalla.blit(bala_img,(110+(num_bala * 10),40))
+    dibujar_texto(pantalla, 'Granadas: ', fuente, BLANCO, 10, 60)
+    for num_granada in range(jugador.granadas):
+        pantalla.blit(granada_img,(120+(num_granada * 15),63))
+    dibujar_texto(pantalla, f'Salud: {jugador.salud}', fuente, BLANCO, 10, 85)
+
 
 
 
@@ -90,7 +102,7 @@ while corriendo:
     #Actualizar y dibujar grupos
     grupo_balas.update(jugador,grupo_balas,grupo_enemigos)
     grupo_balas.update(enemigo,grupo_balas,grupo_enemigos)
-    grupo_granadas.update(grupo_explosiones,grupo_enemigos)
+    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador)
     grupo_explosiones.update()
     grupo_cajas_items.update(jugador)
     grupo_balas.draw(pantalla)
