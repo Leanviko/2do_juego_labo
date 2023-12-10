@@ -95,7 +95,7 @@ while corriendo:
     jugador.dibujado(pantalla)
     
     for enemigo in grupo_enemigos:
-        enemigo.ia(jugador)
+        enemigo.ia(pantalla, jugador, Bala, grupo_balas)
         enemigo.update()
         enemigo.dibujado(pantalla)
     

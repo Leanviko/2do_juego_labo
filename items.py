@@ -12,6 +12,7 @@ class CajaItem(pygame.sprite.Sprite):
         pygame.sprite.Sprite.__init__(self)
         self.item_tipo = item_tipo
         self.image = item_cajas[item_tipo].convert_alpha()
+        self.image = pygame.transform.scale_by(self.image,0.8)
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + BLOQUE_TAMANIO//2, y + (BLOQUE_TAMANIO - self.image.get_height()))
     

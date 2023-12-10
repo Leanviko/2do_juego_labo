@@ -3,11 +3,13 @@ import json
 import os
 import random
 
+
 with open("variables.json","r") as var:
     variables = json.load(var)
 
 GRAVEDAD = variables["GRAVEDAD"]
 BLOQUE_TAMANIO = variables["BLOQUE_TAMANIO"]
+ROJO = variables["ROJO"]
 
 class Personaje(pygame.sprite.Sprite):
     def __init__(self, tipo, x, y, escala, velocidad, salud, municion, granadas):
@@ -39,6 +41,7 @@ class Personaje(pygame.sprite.Sprite):
         self.contador_movimiento = 0
         self.pausa_movimiento = False
         self.contador_pausa_movimiento = 0
+        self.vision = pygame.Rect(0,0,150,20)
         
         #cargando todos los tipos de imagen
         animacion_tipos =['parado','corriendo','salto','muerte']
@@ -108,7 +111,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador):
+    def ia(self, pantalla, jugador, Bala, grupo_balas):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -116,27 +119,36 @@ class Personaje(pygame.sprite.Sprite):
                 self.actualizar_accion(0)#parado
                 self.pausa_movimiento = True
                 self.contador_pausa_movimiento = 50
-
-            if self.pausa_movimiento == False:  
-                if self.direccion == 1:
-                    ia_mover_derecha = True
-                else:
-                    ia_mover_derecha = False
-                
-                #evitamos que la ia quiera moverse a ambos lados
-                ia_mover_izquierda = not ia_mover_derecha
-
-                self.movimiento(ia_mover_izquierda, ia_mover_derecha)
-                self.actualizar_accion(1)#correr
-                
-                self.contador_movimiento += 1 #pasos hasta que de la vuelta
-                if self.contador_movimiento > BLOQUE_TAMANIO:
-                    self.direccion *= -1
-                    self.contador_movimiento = 0
+            #deternerse y disparar cuando ven al jugador
+            if self.vision.colliderect(jugador.rect):
+                self.actualizar_accion(0)#parado
+                self.disparar(Bala, grupo_balas)
             else:
-                self.contador_pausa_movimiento -= 1
-                if self.contador_pausa_movimiento <= 0:
-                    self.pausa_movimiento = False
+                #asocio flip() con la dirección de movimiento
+                if self.pausa_movimiento == False:  
+                    if self.direccion == 1:
+                        ia_mover_derecha = True
+                    else:
+                        ia_mover_derecha = False
+                    
+                    #evitamos que la ia quiera moverse a ambos lados
+                    ia_mover_izquierda = not ia_mover_derecha
+
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha)
+                    self.actualizar_accion(1)#correr
+                    self.contador_movimiento += 1 #pasos hasta que de la vuelta
+
+                    #actualizar vision de los enemigos
+                    self.vision.center = (self.rect.centerx + 75 * self.direccion, self.rect.centery)
+                    #pygame.draw.rect(pantalla, ROJO, self.vision)
+
+                    if self.contador_movimiento > BLOQUE_TAMANIO:
+                        self.direccion *= -1
+                        self.contador_movimiento = 0
+                else:
+                    self.contador_pausa_movimiento -= 1
+                    if self.contador_pausa_movimiento <= 0:
+                        self.pausa_movimiento = False
 
 
     

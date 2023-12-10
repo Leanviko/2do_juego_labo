@@ -26,6 +26,11 @@ class Bala(pygame.sprite.Sprite):
         if self.rect.right < 0 or self.rect.left > ANCHO_PANTALLA:
             self.kill()
         
+        if pygame.sprite.spritecollide(personaje, grupo_balas, False):
+                if personaje.vive:
+                    personaje.salud -= 10
+                    self.kill()
+        
         for enemigo in grupo_enemigos:
             if pygame.sprite.spritecollide(enemigo, grupo_balas, False):
                 if enemigo.vive:
