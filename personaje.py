@@ -2,13 +2,13 @@ import pygame
 import json
 import os
 import random
+from assets import *
 
 
 with open("variables.json","r") as var:
     variables = json.load(var)
 
 GRAVEDAD = variables["GRAVEDAD"]
-BLOQUE_TAMANIO = variables["BLOQUE_TAMANIO"]
 ROJO = variables["ROJO"]
 
 class Personaje(pygame.sprite.Sprite):
@@ -106,7 +106,7 @@ class Personaje(pygame.sprite.Sprite):
     def disparar(self, Bala, grupo_balas):
         if self.cadencia_tiro == 0 and self.municion > 0:
             self.cadencia_tiro = 20
-            bala = Bala(self.rect.centerx + (0.6* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion)
+            bala = Bala(self.rect.centerx + (0.8* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion)
             grupo_balas.add(bala)
             #reducir municion
             self.municion -=1

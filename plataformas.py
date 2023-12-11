@@ -55,27 +55,32 @@ grupo_granadas = pygame.sprite.Group()
 grupo_explosiones = pygame.sprite.Group()
 grupo_enemigos = pygame.sprite.Group()
 grupo_cajas_items = pygame.sprite.Group()
+grupo_decoracion = pygame.sprite.Group()
+grupo_agua = pygame.sprite.Group()
+grupo_salidas = pygame.sprite.Group()
 
-caja_salud = CajaItem('Salud', 300, 260)
-grupo_cajas_items.add(caja_salud)
-caja_municion = CajaItem('Municion', 400, 260)
-grupo_cajas_items.add(caja_municion)
-caja_granada = CajaItem('Granada', 600, 260)
-grupo_cajas_items.add(caja_granada)
+# caja_salud = CajaItem('Salud', 300, 260)
+# grupo_cajas_items.add(caja_salud)
+# caja_municion = CajaItem('Municion', 400, 260)
+# grupo_cajas_items.add(caja_municion)
+# caja_granada = CajaItem('Granada', 600, 260)
+# grupo_cajas_items.add(caja_granada)
 
 
 
 
-jugador = Personaje('jugador',200,200,1.7,5,100,25,5)
-caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
-enemigo = Personaje('enemigo',420,200,1.7,2,35,25,0)
-enemigo2 = Personaje('enemigo',510,200,1.7,2,35,25,0)
-grupo_enemigos.add(enemigo)
-grupo_enemigos.add(enemigo2)
+# jugador = Personaje('jugador',200,200,1.7,5,100,25,5)
+# caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
+#enemigo = Personaje('enemigo',420,200,1.7,2,35,25,0)
+#grupo_enemigos.add(enemigo)
+
 
 
 #carga de niveles
-cargar_niveles(FILAS,COLUMNAS,nivel)
+data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
+
+mundo = Mundo()
+jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
 
 
 
@@ -84,7 +89,10 @@ cargar_niveles(FILAS,COLUMNAS,nivel)
 corriendo = True
 while corriendo:
     reloj.tick(FPS)
+
     dibujo_piso()
+    #dibujar nivel
+    mundo.dibujado(pantalla)
     
     #mostrar salud/municion/granadas
     caja_salud.dibujar(pantalla, jugador.salud)
@@ -115,10 +123,16 @@ while corriendo:
     grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador)
     grupo_explosiones.update()
     grupo_cajas_items.update(jugador)
+    grupo_decoracion.update()
+    grupo_agua.update()
+    grupo_salidas.update()
     grupo_balas.draw(pantalla)
     grupo_granadas.draw(pantalla)
     grupo_explosiones.draw(pantalla)
     grupo_cajas_items.draw(pantalla)
+    grupo_decoracion.draw(pantalla)
+    grupo_agua.draw(pantalla)
+    grupo_salidas.draw(pantalla)
 
     if jugador.vive:
         if disparar:

@@ -1,6 +1,9 @@
 import pygame
 import csv
 from assets import *
+from personaje import *
+from salud import *
+from items import *
 
 
 def cargar_niveles(FILAS,COLUMNAS,nivel):
@@ -15,20 +18,79 @@ def cargar_niveles(FILAS,COLUMNAS,nivel):
         for x, fila in enumerate(lectura):
             for y, bloque in enumerate(fila):
                 data_niveles[x][y] = int(bloque) #el numero del archivo se asigna a la posicion de la lista del juego
+    
+    return data_niveles
 
-    print(data_niveles)
+    #print(data_niveles)
 
 
 class Mundo():
     def __init__(self):
         self.lista_obstaculos = []
 
-    def procesamiento_datos(self, datos):
+    def procesamiento_datos(self, datos, grupo_enemigos, grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas):
         for y, fila in enumerate(datos):
             for x, bloque in enumerate(fila):
                 if bloque >= 0:
-                    img = bloques_img_lista[bloque]
+                    img = bloques_img_lista[bloque] #importado de assets
                     img_rect = img.get_rect()
                     img_rect.x = x*BLOQUE_TAMANIO
-                    img_rect.y = x*BLOQUE_TAMANIO
-                    tile_data = (img, img_rect)
+                    img_rect.y = y*BLOQUE_TAMANIO
+                    bloque_data = (img, img_rect)
+
+                    if bloque >=0 and bloque <= 8:#bloques de terreno
+                        self.lista_obstaculos.append(bloque_data)
+                    elif bloque >= 9 and bloque <=10:
+                        #agua
+                        agua = Agua(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_agua.add(agua)
+                    elif bloque >= 11 and bloque <= 14:
+                        #decoracion
+                        decoracion = Decoracion(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_decoracion.add(decoracion)
+                    elif bloque == 15: #jugador
+                        jugador = Personaje('jugador', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,5,100,25,5)
+                        caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
+                    elif bloque == 16:
+                        enemigo = Personaje('enemigo',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,2,35,25,0)
+                        grupo_enemigos.add(enemigo)
+                    elif bloque == 17:
+                        caja_municion = CajaItem('Municion', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_cajas_items.add(caja_municion)
+                    elif bloque == 18:
+                        caja_granada = CajaItem('Granada', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_cajas_items.add(caja_granada)
+                    elif bloque == 19:
+                        caja_salud = CajaItem('Salud', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_cajas_items.add(caja_salud)
+                    elif bloque == 20:
+                        salida = Salida(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_salidas.add(salida)
+                        
+        return jugador, caja_salud
+
+
+    def dibujado(self,pantalla):
+        for bloque in self.lista_obstaculos:
+            pantalla.blit(bloque[0],bloque[1])
+
+class Decoracion(pygame.sprite.Sprite):
+    def __init__(self, imagen, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = imagen
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+
+class Agua(pygame.sprite.Sprite):
+    def __init__(self, imagen, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = imagen
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+
+class Salida(pygame.sprite.Sprite):
+    def __init__(self, imagen, x, y):
+        pygame.sprite.Sprite.__init__(self)
+        self.image = imagen
+        self.rect = self.image.get_rect()
+        self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))

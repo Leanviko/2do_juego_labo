@@ -1,11 +1,11 @@
 import pygame
 import json
-from assets import item_cajas
+from assets import *
 
 with open("variables.json","r") as var:
     variables = json.load(var)
 
-BLOQUE_TAMANIO = variables["BLOQUE_TAMANIO"]
+
 
 class CajaItem(pygame.sprite.Sprite):
     def __init__(self, item_tipo, x, y):

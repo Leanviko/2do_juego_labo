@@ -8,7 +8,6 @@ with open("variables.json","r") as var:
 
 ANCHO_PANTALLA = variables["ANCHO_PANTALLA"]
 GRAVEDAD = variables["GRAVEDAD"]
-BLOQUE_TAMANIO = variables["BLOQUE_TAMANIO"]
 
 class Bala(pygame.sprite.Sprite):
     def __init__(self,x,y,direccion):
