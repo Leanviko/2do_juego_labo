@@ -59,6 +59,8 @@ class Personaje(pygame.sprite.Sprite):
         self.imagen = self.animacion_lista[self.accion][self.frame_indice]
         self.rect = self.imagen.get_rect()
         self.rect.center = (x, y)
+        self.ancho = self.imagen.get_width()
+        self.alto = self.imagen.get_height()
 
     def update(self):
         self.animacion()
@@ -68,7 +70,7 @@ class Personaje(pygame.sprite.Sprite):
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos):
         dx = 0
         dy = 0
         if mov_izquierda:
@@ -94,11 +96,29 @@ class Personaje(pygame.sprite.Sprite):
         if self.velocidad_y >10:
             self.velocidad_y
         dy += self.velocidad_y
+
+
         
         #chequeamos colision con el suelo
-        if self.rect.bottom + dy > 300:
-            dy = 300 - self.rect.bottom
-            self.en_aire = False
+        for bloque in lista_obstaculos:
+            #la colision agrego dx, dy para determinar la colision antes de que ocurra. dx,dy cambian antes de cambiar la pos del rectangulo
+            if bloque[1].colliderect(self.rect.x + dx, self.rect.y, self.ancho, self.alto):
+                dx = 0 # dejara de moverse en x
+            if bloque[1].colliderect(self.rect.x, self.rect.y + dy, self.ancho, self.alto):
+#---> no entiendo   #chekeamos si esta comenzando a saltar
+                if self.velocidad_y < 0:
+                    self.velocidad_y = 0
+                    dy = bloque[1].bottom - self.rect.top
+                #chequeamos cuando cae
+                elif self.velocidad_y > 0:
+                    self.velocidad_y = 0
+                    self.en_aire = False
+                    dy = bloque[1].top - self.rect.bottom
+
+
+        # if self.rect.bottom + dy > 300:
+        #     dy = 300 - self.rect.bottom
+        #     self.en_aire = False
         
         self.rect.x += dx
         self.rect.y += dy
@@ -111,7 +131,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, pantalla, jugador, Bala, grupo_balas):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -134,7 +154,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 

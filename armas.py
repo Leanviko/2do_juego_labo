@@ -18,12 +18,16 @@ class Bala(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direccion = direccion
 
-    def update(self,personaje,grupo_balas,grupo_enemigos):
+    def update(self,personaje,grupo_balas,grupo_enemigos, lista_obstaculos):
         #mover balas
         self.rect.x += (self.direccion * self.velocidad)
         #chequear si las balas salen de la pantalla
         if self.rect.right < 0 or self.rect.left > ANCHO_PANTALLA:
             self.kill()
+        #chequear si exite colision con los elementos de nivel
+        for bloque in lista_obstaculos:
+            if bloque[1].colliderect(self.rect):
+                    self.kill()
         
         if pygame.sprite.spritecollide(personaje, grupo_balas, False):
                 if personaje.vive:
@@ -46,22 +50,38 @@ class Granada(pygame.sprite.Sprite):
         self.image = granada_img.convert_alpha()
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
+        self.ancho = self.image.get_width()
+        self.alto = self.image.get_height()
         self.direccion = direccion
         
     
-    def update(self,grupo_explosiones,grupo_enemigos,jugador):
+    def update(self,grupo_explosiones,grupo_enemigos,jugador, lista_obstaculos):
         self.velocidad_y += GRAVEDAD
         dy = self.velocidad_y
         dx = self.direccion * self.velocidad
 
-        #colision con el suelo
-        if self.rect.bottom + dy > 300:
-            self.velocidad = 0
-            dy = 300 - self.rect.bottom
+        #chequeamos colision con en nivel
+        for bloque in lista_obstaculos:
+            if bloque[1].colliderect(self.rect.x + dx, self.rect.y, self.ancho, self.alto):
+                self.direccion *= -1
+                dx = self.direccion * self.velocidad
 
-        #rebote con el borde de pantalla
-        if self.rect.left + dx < 0 or self.rect.right + dx > ANCHO_PANTALLA:
-            self.direccion *= -1
+        #chequeamos colision con elementos nivel
+        for bloque in lista_obstaculos:
+            #la colision agrego dx, dy para determinar la colision antes de que ocurra. dx,dy cambian antes de cambiar la pos del rectangulo
+            if bloque[1].colliderect(self.rect.x + dx, self.rect.y, self.ancho, self.alto):
+                dx = 0 # dejara de moverse en x
+            if bloque[1].colliderect(self.rect.x, self.rect.y + dy, self.ancho, self.alto):
+                self.velocidad = 0
+#---> no entiendo   
+                #chekeamos si es lanzadar
+                if self.velocidad_y < 0:
+                    self.velocidad_y = 0
+                    dy = bloque[1].bottom - self.rect.top
+                #chequeamos cuando cae
+                elif self.velocidad_y > 0:
+                    self.velocidad_y = 0
+                    dy = bloque[1].top - self.rect.bottom
 
 
         

@@ -28,7 +28,7 @@ nivel = 1
 
 def dibujo_piso():
     pantalla.fill(COLOR_FONDO)
-    pygame.draw.line(pantalla, ROJO, (0, 300), (ANCHO_PANTALLA, 300))
+    #pygame.draw.line(pantalla, ROJO, (0, 300), (ANCHO_PANTALLA, 300))
 
 
 pygame.init()
@@ -112,15 +112,15 @@ while corriendo:
     jugador.dibujado(pantalla)
     
     for enemigo in grupo_enemigos:
-        enemigo.ia(pantalla, jugador, Bala, grupo_balas)
+        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos)
         enemigo.update()
         enemigo.dibujado(pantalla)
     
 
     #Actualizar y dibujar grupos
-    grupo_balas.update(jugador,grupo_balas,grupo_enemigos)
-    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos)
-    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador)
+    grupo_balas.update(jugador,grupo_balas,grupo_enemigos,mundo.lista_obstaculos)
+    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos,mundo.lista_obstaculos)
+    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador,mundo.lista_obstaculos)
     grupo_explosiones.update()
     grupo_cajas_items.update(jugador)
     grupo_decoracion.update()
@@ -149,7 +149,7 @@ while corriendo:
             jugador.actualizar_accion(1)#correr
         else:
             jugador.actualizar_accion(0)#estar parado
-        jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha)
+        jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos)
     
 
 
