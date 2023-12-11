@@ -4,27 +4,31 @@ from armas import *
 from items import *
 from informacion import *
 from salud import *
+from niveles import *
 import json
+import csv
 
 with open("variables.json","r") as var:
     variables = json.load(var)
 
-GRAVEDAD = variables["GRAVEDAD"]
 
 
 ANCHO_PANTALLA = variables["ANCHO_PANTALLA"]
 ALTO_PANTALLA = variables["ALTO_PANTALLA"]
+GRAVEDAD = variables["GRAVEDAD"]
 FPS = variables["FPS"]
 COLOR_FONDO = variables["COLOR_FONDO"]
 ROJO = variables["ROJO"]
 BLANCO = variables["BLANCO"]
+COLUMNAS = variables["COLUMNAS"]
+FILAS = variables["FILAS"]
+BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
+#BLOQUES_TIPOS= 21
+nivel = 1
 
 def dibujo_piso():
     pantalla.fill(COLOR_FONDO)
     pygame.draw.line(pantalla, ROJO, (0, 300), (ANCHO_PANTALLA, 300))
-
-
-
 
 
 pygame.init()
@@ -68,6 +72,11 @@ enemigo = Personaje('enemigo',420,200,1.7,2,35,25,0)
 enemigo2 = Personaje('enemigo',510,200,1.7,2,35,25,0)
 grupo_enemigos.add(enemigo)
 grupo_enemigos.add(enemigo2)
+
+
+#carga de niveles
+cargar_niveles(FILAS,COLUMNAS,nivel)
+
 
 
 

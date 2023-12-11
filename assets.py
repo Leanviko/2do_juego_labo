@@ -1,11 +1,28 @@
 import pygame
+import json
+
 pygame.font.init()
+
+with open("variables.json","r") as var:
+    variables = json.load(var)
+ALTO_PANTALLA = variables["ALTO_PANTALLA"]
+FILAS = variables["FILAS"]
+BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
+
 
 bala_img = pygame.image.load('img/iconos/bala.png')
 granada_img =pygame.image.load('img/iconos/granada.png')
 caja_salud_img =pygame.image.load('img/iconos/caja_salud.png')
 caja_municion_img =pygame.image.load('img/iconos/caja_municion.png')
 caja_granada_img =pygame.image.load('img/iconos/caja_granada.png')
+
+#bloques
+BLOQUES_TIPOS= 21
+bloques_img_lista = []
+for i in range(BLOQUES_TIPOS):
+    img = pygame.image.load(f'img/bloques/{i}.png')
+    img = pygame.transform.scale(img,(BLOQUE_TAMANIO,BLOQUE_TAMANIO))
+    bloques_img_lista.append(img)
 
 #fuentes
 fuente = pygame.font.SysFont('Futura', 30)
