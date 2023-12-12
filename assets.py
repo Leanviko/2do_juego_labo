@@ -10,6 +10,12 @@ FILAS = variables["FILAS"]
 BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
 
 
+#fondo de pantalla
+pinos1_img = pygame.image.load('img/fondo/pinos1.png')
+pinos2_img = pygame.image.load('img/fondo/pinos2.png')
+montanias_img = pygame.image.load('img/fondo/montanias.png')
+cielo_img = pygame.image.load('img/fondo/cielo.png')
+
 bala_img = pygame.image.load('img/iconos/bala.png')
 granada_img =pygame.image.load('img/iconos/granada.png')
 caja_salud_img =pygame.image.load('img/iconos/caja_salud.png')

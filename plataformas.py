@@ -16,6 +16,7 @@ with open("variables.json","r") as var:
 ANCHO_PANTALLA = variables["ANCHO_PANTALLA"]
 ALTO_PANTALLA = variables["ALTO_PANTALLA"]
 GRAVEDAD = variables["GRAVEDAD"]
+DESLIZAR_HORIZONTAL = variables["DESLIZAR_HORIZONTAL"]
 FPS = variables["FPS"]
 COLOR_FONDO = variables["COLOR_FONDO"]
 ROJO = variables["ROJO"]
@@ -23,12 +24,19 @@ BLANCO = variables["BLANCO"]
 COLUMNAS = variables["COLUMNAS"]
 FILAS = variables["FILAS"]
 BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
-#BLOQUES_TIPOS= 21
+
+deslizamiento_pantalla = 0
+fondo_deslizamiento = 0
 nivel = 1
 
-def dibujo_piso():
+def dibujo_fondo():
     pantalla.fill(COLOR_FONDO)
-    #pygame.draw.line(pantalla, ROJO, (0, 300), (ANCHO_PANTALLA, 300))
+    pantalla.blit(cielo_img,(0,0))
+    pantalla.blit(montanias_img,(0,ALTO_PANTALLA - montanias_img.get_height()-300))
+    pantalla.blit(pinos1_img,(0,ALTO_PANTALLA - pinos1_img.get_height()-150))
+    pantalla.blit(pinos2_img,(0,ALTO_PANTALLA - pinos2_img.get_height()))
+    
+
 
 
 pygame.init()
@@ -59,20 +67,6 @@ grupo_decoracion = pygame.sprite.Group()
 grupo_agua = pygame.sprite.Group()
 grupo_salidas = pygame.sprite.Group()
 
-# caja_salud = CajaItem('Salud', 300, 260)
-# grupo_cajas_items.add(caja_salud)
-# caja_municion = CajaItem('Municion', 400, 260)
-# grupo_cajas_items.add(caja_municion)
-# caja_granada = CajaItem('Granada', 600, 260)
-# grupo_cajas_items.add(caja_granada)
-
-
-
-
-# jugador = Personaje('jugador',200,200,1.7,5,100,25,5)
-# caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
-#enemigo = Personaje('enemigo',420,200,1.7,2,35,25,0)
-#grupo_enemigos.add(enemigo)
 
 
 
@@ -90,7 +84,7 @@ corriendo = True
 while corriendo:
     reloj.tick(FPS)
 
-    dibujo_piso()
+    dibujo_fondo()
     #dibujar nivel
     mundo.dibujado(pantalla)
     
@@ -112,7 +106,7 @@ while corriendo:
     jugador.dibujado(pantalla)
     
     for enemigo in grupo_enemigos:
-        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos)
+        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
         enemigo.update()
         enemigo.dibujado(pantalla)
     
@@ -149,7 +143,9 @@ while corriendo:
             jugador.actualizar_accion(1)#correr
         else:
             jugador.actualizar_accion(0)#estar parado
-        jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos)
+        deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
+
+        print(deslizamiento_pantalla )
     
 
 

@@ -70,7 +70,9 @@ class Personaje(pygame.sprite.Sprite):
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL):
+
+        deslizamiento_pantalla = 0
         dx = 0
         dy = 0
         if mov_izquierda:
@@ -123,6 +125,16 @@ class Personaje(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += dy
 
+        #actualizo el paneo dependiendo la posicion
+#Estudiar--->        
+        if self.tipo == "jugador":
+            if self.rect.right > ANCHO_PANTALLA - DESLIZAR_HORIZONTAL or self.rect.left < DESLIZAR_HORIZONTAL:
+                self.rect.x -= dx
+                deslizamiento_pantalla = -dx
+
+        return deslizamiento_pantalla
+
+
     def disparar(self, Bala, grupo_balas):
         if self.cadencia_tiro == 0 and self.municion > 0:
             self.cadencia_tiro = 20
@@ -131,7 +143,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -154,7 +166,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 
