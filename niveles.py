@@ -67,6 +67,9 @@ class Mundo():
                     elif bloque == 20:
                         salida = Salida(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
                         grupo_salidas.add(salida)
+                    elif bloque == 21: #nuevo
+                        enemigo2 = Personaje('jefe',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,3,0,3000,25,0)
+                        grupo_enemigos.add(enemigo2)
                         
         return jugador, caja_salud
 

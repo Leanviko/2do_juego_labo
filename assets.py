@@ -29,7 +29,7 @@ caja_municion_img =pygame.image.load('img/iconos/caja_municion.png')
 caja_granada_img =pygame.image.load('img/iconos/caja_granada.png')
 
 #bloques
-BLOQUES_TIPOS= 21
+BLOQUES_TIPOS= 22
 bloques_img_lista = []
 for i in range(BLOQUES_TIPOS):
     img = pygame.image.load(f'img/bloques/{i}.png')
