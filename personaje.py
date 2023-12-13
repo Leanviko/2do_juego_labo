@@ -25,7 +25,7 @@ class Personaje(pygame.sprite.Sprite):
         self.cadencia_tiro = 0
         self.granadas = granadas
         #salto
-        self.velocidad_y = 0
+        self.velocidad_salto = 0
         self.salto = False
         self.en_aire = False
         #giro
@@ -70,67 +70,80 @@ class Personaje(pygame.sprite.Sprite):
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel):
 
         deslizamiento_pantalla = 0
         dx = 0
         dy = 0
+
         if mov_izquierda:
             dx = -self.velocidad
             self.flip = True
             self.direccion = -1
-            #self.actualizar_accion(1)#correr
-        if mov_derecha:
-            dx += self.velocidad
+        elif mov_derecha:
+            dx = self.velocidad
             self.flip = False
             self.direccion = 1
-            #self.actualizar_accion(1)
+
+
         
+        #print(f'dx: {dx}')
+
         #salto
         if self.salto == True and self.en_aire == False:
-            self.velocidad_y = -11
+            self.velocidad_salto = -11
             self.salto = False
             self.en_aire = True
             
         
         #aplicamos gravedad
-        self.velocidad_y += GRAVEDAD
-        if self.velocidad_y >10:
-            self.velocidad_y
-        dy += self.velocidad_y
+        self.velocidad_salto += GRAVEDAD
+        if self.velocidad_salto >10:
+            self.velocidad_salto
+        
+        dy += self.velocidad_salto
 
-
+        
         
         #chequeamos colision con el suelo
         for bloque in lista_obstaculos:
             #la colision agrego dx, dy para determinar la colision antes de que ocurra. dx,dy cambian antes de cambiar la pos del rectangulo
             if bloque[1].colliderect(self.rect.x + dx, self.rect.y, self.ancho, self.alto):
                 dx = 0 # dejara de moverse en x
+
+                #si la IA colisiona con un muro cambia de dir
+                if self.tipo == "enemigo":
+                    self.direccion *= -1
+                    self.contador_movimiento = 0
+
             if bloque[1].colliderect(self.rect.x, self.rect.y + dy, self.ancho, self.alto):
 #---> no entiendo   #chekeamos si esta comenzando a saltar
-                if self.velocidad_y < 0:
-                    self.velocidad_y = 0
+                if self.velocidad_salto < 0:
+                    self.velocidad_salto = 0
                     dy = bloque[1].bottom - self.rect.top
                 #chequeamos cuando cae
-                elif self.velocidad_y > 0:
-                    self.velocidad_y = 0
+                elif self.velocidad_salto >= 0:
+                    self.velocidad_salto = 0
                     self.en_aire = False
                     dy = bloque[1].top - self.rect.bottom
 
-
-        # if self.rect.bottom + dy > 300:
-        #     dy = 300 - self.rect.bottom
-        #     self.en_aire = False
-        
         self.rect.x += dx
-        self.rect.y += dy
+        self.rect.y += int(dy)
 
+        #limito el movimiento del personaje en los bordes del nivel
+        if self.tipo == "jugador":
+            if self.rect.left + dx < 0 or self.rect.right + dx > ANCHO_PANTALLA:
+                dx = 0
+        
         #actualizo el paneo dependiendo la posicion
 #Estudiar--->        
         if self.tipo == "jugador":
-            if self.rect.right > ANCHO_PANTALLA - DESLIZAR_HORIZONTAL or self.rect.left < DESLIZAR_HORIZONTAL:
-                self.rect.x -= dx
-                deslizamiento_pantalla = -dx
+            if self.salud > 0:
+                if (self.rect.right > ANCHO_PANTALLA - DESLIZAR_HORIZONTAL and fondo_deslizamiento<(largo_nivel*BLOQUE_TAMANIO)-ANCHO_PANTALLA) or (self.rect.left < DESLIZAR_HORIZONTAL and fondo_deslizamiento> abs(dx)):
+                    self.rect.x -= dx
+                    deslizamiento_pantalla = -dx
+            else:
+                deslizamiento_pantalla = 0
 
         return deslizamiento_pantalla
 
@@ -143,7 +156,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -166,7 +179,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 
@@ -181,6 +194,8 @@ class Personaje(pygame.sprite.Sprite):
                     self.contador_pausa_movimiento -= 1
                     if self.contador_pausa_movimiento <= 0:
                         self.pausa_movimiento = False
+        
+        self.rect.x += deslizamiento_pantalla
 
 
     

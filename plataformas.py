@@ -31,10 +31,12 @@ nivel = 1
 
 def dibujo_fondo():
     pantalla.fill(COLOR_FONDO)
-    pantalla.blit(cielo_img,(0,0))
-    pantalla.blit(montanias_img,(0,ALTO_PANTALLA - montanias_img.get_height()-300))
-    pantalla.blit(pinos1_img,(0,ALTO_PANTALLA - pinos1_img.get_height()-150))
-    pantalla.blit(pinos2_img,(0,ALTO_PANTALLA - pinos2_img.get_height()))
+    ancho_fondos = cielo_img.get_width()
+    for i in range(5):
+        pantalla.blit(cielo_img,((ancho_fondos* i)-fondo_deslizamiento*0.5,0))
+        pantalla.blit(montanias_img,((ancho_fondos* i)-fondo_deslizamiento*0.6,ALTO_PANTALLA - montanias_img.get_height()-300))
+        pantalla.blit(pinos1_img,((ancho_fondos* i)-fondo_deslizamiento*0.7,ALTO_PANTALLA - pinos1_img.get_height()-150))
+        pantalla.blit(pinos2_img,((ancho_fondos* i)-fondo_deslizamiento*0.8,ALTO_PANTALLA - pinos2_img.get_height()))
     
 
 
@@ -82,11 +84,11 @@ jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grup
 #* bucle principal -----------------------------
 corriendo = True
 while corriendo:
-    reloj.tick(FPS)
+    
 
     dibujo_fondo()
     #dibujar nivel
-    mundo.dibujado(pantalla)
+    mundo.dibujado(pantalla, deslizamiento_pantalla)
     
     #mostrar salud/municion/granadas
     caja_salud.dibujar(pantalla, jugador.salud)
@@ -106,20 +108,20 @@ while corriendo:
     jugador.dibujado(pantalla)
     
     for enemigo in grupo_enemigos:
-        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
+        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel)
         enemigo.update()
         enemigo.dibujado(pantalla)
     
 
     #Actualizar y dibujar grupos
-    grupo_balas.update(jugador,grupo_balas,grupo_enemigos,mundo.lista_obstaculos)
-    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos,mundo.lista_obstaculos)
-    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador,mundo.lista_obstaculos)
-    grupo_explosiones.update()
-    grupo_cajas_items.update(jugador)
-    grupo_decoracion.update()
-    grupo_agua.update()
-    grupo_salidas.update()
+    grupo_balas.update(jugador,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
+    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
+    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador,mundo.lista_obstaculos,deslizamiento_pantalla)
+    grupo_explosiones.update(deslizamiento_pantalla)
+    grupo_cajas_items.update(jugador, deslizamiento_pantalla)
+    grupo_decoracion.update(deslizamiento_pantalla)
+    grupo_agua.update(deslizamiento_pantalla)
+    grupo_salidas.update(deslizamiento_pantalla)
     grupo_balas.draw(pantalla)
     grupo_granadas.draw(pantalla)
     grupo_explosiones.draw(pantalla)
@@ -143,9 +145,10 @@ while corriendo:
             jugador.actualizar_accion(1)#correr
         else:
             jugador.actualizar_accion(0)#estar parado
-        deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL)
+        deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel)
+        fondo_deslizamiento -= deslizamiento_pantalla
 
-        print(deslizamiento_pantalla )
+        print(jugador.rect.y)
     
 
 
@@ -158,8 +161,10 @@ while corriendo:
         if evento.type == pygame.KEYDOWN:
             if evento.key == pygame.K_a:
                 jugador_mov_izquierda = True
+                
             if evento.key == pygame.K_d:   
                 jugador_mov_derecha = True
+                
             if evento.key == pygame.K_SPACE:   
                 disparar = True
             if evento.key == pygame.K_g:   
@@ -182,3 +187,4 @@ while corriendo:
             
     
     pygame.display.update()
+    reloj.tick(FPS)

@@ -29,6 +29,7 @@ class Mundo():
         self.lista_obstaculos = []
 
     def procesamiento_datos(self, datos, grupo_enemigos, grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas):
+        self.largo_nivel = len(datos[0])#datos[0]:cantidad de columnas
         for y, fila in enumerate(datos):
             for x, bloque in enumerate(fila):
                 if bloque >= 0:
@@ -70,8 +71,9 @@ class Mundo():
         return jugador, caja_salud
 
 
-    def dibujado(self,pantalla):
+    def dibujado(self,pantalla, deslizamiento_pantalla):
         for bloque in self.lista_obstaculos:
+            bloque[1][0] += deslizamiento_pantalla
             pantalla.blit(bloque[0],bloque[1])
 
 class Decoracion(pygame.sprite.Sprite):
@@ -80,6 +82,9 @@ class Decoracion(pygame.sprite.Sprite):
         self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+    
+    def update(self,deslizamiento_pantalla):
+        self.rect.x += deslizamiento_pantalla
 
 class Agua(pygame.sprite.Sprite):
     def __init__(self, imagen, x, y):
@@ -87,6 +92,9 @@ class Agua(pygame.sprite.Sprite):
         self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+    
+    def update(self,deslizamiento_pantalla):
+        self.rect.x += deslizamiento_pantalla
 
 class Salida(pygame.sprite.Sprite):
     def __init__(self, imagen, x, y):
@@ -94,3 +102,6 @@ class Salida(pygame.sprite.Sprite):
         self.image = imagen
         self.rect = self.image.get_rect()
         self.rect.midtop = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+    
+    def update(self,deslizamiento_pantalla):
+        self.rect.x += deslizamiento_pantalla

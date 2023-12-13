@@ -18,9 +18,9 @@ class Bala(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.direccion = direccion
 
-    def update(self,personaje,grupo_balas,grupo_enemigos, lista_obstaculos):
+    def update(self,personaje,grupo_balas,grupo_enemigos, lista_obstaculos,deslizamiento_pantalla):
         #mover balas
-        self.rect.x += (self.direccion * self.velocidad)
+        self.rect.x += (self.direccion * self.velocidad) + deslizamiento_pantalla
         #chequear si las balas salen de la pantalla
         if self.rect.right < 0 or self.rect.left > ANCHO_PANTALLA:
             self.kill()
@@ -55,7 +55,7 @@ class Granada(pygame.sprite.Sprite):
         self.direccion = direccion
         
     
-    def update(self,grupo_explosiones,grupo_enemigos,jugador, lista_obstaculos):
+    def update(self,grupo_explosiones,grupo_enemigos,jugador, lista_obstaculos, deslizamiento_pantalla):
         self.velocidad_y += GRAVEDAD
         dy = self.velocidad_y
         dx = self.direccion * self.velocidad
@@ -86,8 +86,8 @@ class Granada(pygame.sprite.Sprite):
 
         
         #actualizar posicion granada
-        self.rect.centerx += dx
-        self.rect.centery += dy
+        self.rect.centerx += dx + deslizamiento_pantalla
+        self.rect.centery += int(dy)
         
         #contador granada
         self.tiempo_explosion -= 1
@@ -96,10 +96,10 @@ class Granada(pygame.sprite.Sprite):
             explosion = Explosion(self.rect.centerx, self.rect.centery, 1)
             grupo_explosiones.add(explosion)
 
-            #radio de daño
-            if abs(self.rect.centerx - jugador.rect.centerx)< BLOQUE_TAMANIO //2 or \
-                    abs(self.rect.centery - jugador.rect.centery)< BLOQUE_TAMANIO //2:
-                    jugador.salud -= 25
+        #radio de daño
+            # if abs(self.rect.centerx - jugador.rect.centerx)< BLOQUE_TAMANIO //2 or \
+            #         abs(self.rect.centery - jugador.rect.centery)< BLOQUE_TAMANIO //2:
+            #         jugador.salud -= 25
 
             for enemigo in grupo_enemigos:
                 if abs(self.rect.centerx - enemigo.rect.centerx)< BLOQUE_TAMANIO //2 or \
@@ -123,7 +123,9 @@ class Explosion(pygame.sprite.Sprite):
         self.rect.center = (x,y)
         self.contador = 0 #controlar animacion
 
-    def update(self):
+    def update(self, deslizamiento_pantalla):
+
+        self.rect.x += deslizamiento_pantalla
         PAUSA_ANIMACION = 4
         self.contador += 1
 

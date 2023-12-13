@@ -16,7 +16,10 @@ class CajaItem(pygame.sprite.Sprite):
         self.rect = self.image.get_rect()
         self.rect.midtop = (x + BLOQUE_TAMANIO//2, y + (BLOQUE_TAMANIO - self.image.get_height()))
     
-    def update(self,jugador):
+    def update(self,jugador, deslizamiento_pantalla):
+
+        self.rect.x += deslizamiento_pantalla
+
         if pygame.sprite.collide_rect(self, jugador):
             if self.item_tipo == 'Salud':
                 jugador.salud += 25
