@@ -65,12 +65,13 @@ class Personaje(pygame.sprite.Sprite):
     def update(self):
         self.animacion()
         self.chequear_vida()
+
         #actualizar cadencia tiro
         if self.cadencia_tiro > 0:
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel,grupo_agua):
 
         deslizamiento_pantalla = 0
         dx = 0
@@ -127,14 +128,23 @@ class Personaje(pygame.sprite.Sprite):
                     self.en_aire = False
                     dy = bloque[1].top - self.rect.bottom
 
-        self.rect.x += dx
-        self.rect.y += int(dy)
+        #colision jugador con el agua radiactiva
+        if pygame.sprite.spritecollide(self, grupo_agua, False):
+            self.salud -= 15
 
+        #chequear si el jugador cae del mapa
+        if self.rect.top > ALTO_PANTALLA:
+            self.salud = 0
+            self.kill()
+
+        
         #limito el movimiento del personaje en los bordes del nivel
         if self.tipo == "jugador":
             if self.rect.left + dx < 0 or self.rect.right + dx > ANCHO_PANTALLA:
                 dx = 0
         
+        self.rect.x += dx
+        self.rect.y += int(dy)
         #actualizo el paneo dependiendo la posicion
 #Estudiar--->        
         if self.tipo == "jugador":
@@ -156,7 +166,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -179,7 +189,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel,grupo_agua)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 

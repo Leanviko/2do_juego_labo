@@ -16,6 +16,12 @@ pinos2_img = pygame.image.load('img/fondo/pinos2.png')
 montanias_img = pygame.image.load('img/fondo/montanias.png')
 cielo_img = pygame.image.load('img/fondo/cielo.png')
 
+#botones imagenes
+inicio_img = pygame.image.load('img/botones/inicio_btn.png')
+reiniciar_img = pygame.image.load('img/botones/reiniciar_btn.png')
+salid_img = pygame.image.load('img/botones/salidas_btn.png')
+
+#armas imagenes
 bala_img = pygame.image.load('img/iconos/bala.png')
 granada_img =pygame.image.load('img/iconos/granada.png')
 caja_salud_img =pygame.image.load('img/iconos/caja_salud.png')

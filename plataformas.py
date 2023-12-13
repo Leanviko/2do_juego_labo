@@ -5,6 +5,8 @@ from items import *
 from informacion import *
 from salud import *
 from niveles import *
+from interfaz import *
+
 import json
 import csv
 
@@ -28,6 +30,7 @@ BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
 deslizamiento_pantalla = 0
 fondo_deslizamiento = 0
 nivel = 1
+iniciar_juego = False
 
 def dibujo_fondo():
     pantalla.fill(COLOR_FONDO)
@@ -37,9 +40,25 @@ def dibujo_fondo():
         pantalla.blit(montanias_img,((ancho_fondos* i)-fondo_deslizamiento*0.6,ALTO_PANTALLA - montanias_img.get_height()-300))
         pantalla.blit(pinos1_img,((ancho_fondos* i)-fondo_deslizamiento*0.7,ALTO_PANTALLA - pinos1_img.get_height()-150))
         pantalla.blit(pinos2_img,((ancho_fondos* i)-fondo_deslizamiento*0.8,ALTO_PANTALLA - pinos2_img.get_height()))
-    
 
+#funcion de reiniciar nivel
+def borrar_datos_grupos():
+    grupo_balas.empty()
+    grupo_granadas.empty()
+    grupo_explosiones.empty()
+    grupo_enemigos.empty()
+    grupo_cajas_items.empty()
+    grupo_decoracion.empty()
+    grupo_agua.empty()
+    grupo_salidas.empty()
 
+    # #crear lista de bloque vacia (todos -1)
+    # datos = []
+    # for fila in range(FILAS):
+    #     f = [-1]* COLUMNAS
+    #     datos.append(f)
+
+    # return datos
 
 pygame.init()
 pygame.font.init()
@@ -48,7 +67,7 @@ pygame.display.set_caption('2do juego')
 reloj = pygame.time.Clock()
 
 #variables juegow
-GRAVEDAD = 0.75
+#GRAVEDAD = 0.75
 
 #variables jugador
 jugador_mov_izquierda = False
@@ -57,7 +76,10 @@ disparar = False
 granada = False
 granada_fue_lanzada = False
 
-
+#crear botones
+boton_inicio = Boton(ANCHO_PANTALLA//2,ALTO_PANTALLA//2-70, inicio_img, 1)
+boton_salida = Boton(ANCHO_PANTALLA//2,ALTO_PANTALLA//2 + 70, salid_img, 1)
+boton_reinicio = Boton(ANCHO_PANTALLA//2, ALTO_PANTALLA//2, reiniciar_img, 2)
 
 #Grupos
 grupo_balas = pygame.sprite.Group()
@@ -84,72 +106,91 @@ jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grup
 #* bucle principal -----------------------------
 corriendo = True
 while corriendo:
-    
 
-    dibujo_fondo()
-    #dibujar nivel
-    mundo.dibujado(pantalla, deslizamiento_pantalla)
-    
-    #mostrar salud/municion/granadas
-    caja_salud.dibujar(pantalla, jugador.salud)
+    if iniciar_juego == False:
+        pantalla.fill(COLOR_FONDO)
+        if boton_inicio.dibujo(pantalla):
+            print("inicio")
+            iniciar_juego = True
+        if boton_salida.dibujo(pantalla):
+            print("salida")
+            corriendo = False
+    else:
+        dibujo_fondo()
+        #dibujar nivel
+        mundo.dibujado(pantalla, deslizamiento_pantalla)
+        
+        #mostrar salud/municion/granadas
+        caja_salud.dibujar(pantalla, jugador.salud)
 
-    dibujar_texto(pantalla, 'Municion: ', fuente, BLANCO, 10, 35)
-    for num_bala in range(jugador.municion):
-        pantalla.blit(bala_img,(110+(num_bala * 10),40))
-    dibujar_texto(pantalla, 'Granadas: ', fuente, BLANCO, 10, 60)
-    for num_granada in range(jugador.granadas):
-        pantalla.blit(granada_img,(120+(num_granada * 15),63))
-    dibujar_texto(pantalla, f'Salud: {jugador.salud}', fuente, BLANCO, 10, 85)
+        dibujar_texto(pantalla, 'Municion: ', fuente, BLANCO, 10, 35)
+        for num_bala in range(jugador.municion):
+            pantalla.blit(bala_img,(110+(num_bala * 10),40))
+        dibujar_texto(pantalla, 'Granadas: ', fuente, BLANCO, 10, 60)
+        for num_granada in range(jugador.granadas):
+            pantalla.blit(granada_img,(120+(num_granada * 15),63))
+        dibujar_texto(pantalla, f'Salud: {jugador.salud}', fuente, BLANCO, 10, 85)
 
 
 
 
-    jugador.update()
-    jugador.dibujado(pantalla)
-    
-    for enemigo in grupo_enemigos:
-        enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel)
-        enemigo.update()
-        enemigo.dibujado(pantalla)
-    
+        jugador.update()
+        jugador.dibujado(pantalla)
+        
+        for enemigo in grupo_enemigos:
+            enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel,grupo_agua)
+            enemigo.update()
+            enemigo.dibujado(pantalla)
+        
 
-    #Actualizar y dibujar grupos
-    grupo_balas.update(jugador,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
-    grupo_balas.update(enemigo,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
-    grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador,mundo.lista_obstaculos,deslizamiento_pantalla)
-    grupo_explosiones.update(deslizamiento_pantalla)
-    grupo_cajas_items.update(jugador, deslizamiento_pantalla)
-    grupo_decoracion.update(deslizamiento_pantalla)
-    grupo_agua.update(deslizamiento_pantalla)
-    grupo_salidas.update(deslizamiento_pantalla)
-    grupo_balas.draw(pantalla)
-    grupo_granadas.draw(pantalla)
-    grupo_explosiones.draw(pantalla)
-    grupo_cajas_items.draw(pantalla)
-    grupo_decoracion.draw(pantalla)
-    grupo_agua.draw(pantalla)
-    grupo_salidas.draw(pantalla)
+        #Actualizar y dibujar grupos
+        grupo_balas.update(jugador,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
+        grupo_balas.update(enemigo,grupo_balas,grupo_enemigos,mundo.lista_obstaculos,deslizamiento_pantalla)
+        grupo_granadas.update(grupo_explosiones,grupo_enemigos,jugador,mundo.lista_obstaculos,deslizamiento_pantalla)
+        grupo_explosiones.update(deslizamiento_pantalla)
+        grupo_cajas_items.update(jugador, deslizamiento_pantalla)
+        grupo_decoracion.update(deslizamiento_pantalla)
+        grupo_agua.update(deslizamiento_pantalla)
+        grupo_salidas.update(deslizamiento_pantalla)
+        grupo_balas.draw(pantalla)
+        grupo_granadas.draw(pantalla)
+        grupo_explosiones.draw(pantalla)
+        grupo_cajas_items.draw(pantalla)
+        grupo_decoracion.draw(pantalla)
+        grupo_agua.draw(pantalla)
+        grupo_salidas.draw(pantalla)
 
-    if jugador.vive:
-        if disparar:
-            jugador.disparar(Bala, grupo_balas)
-        elif granada and granada_fue_lanzada == False and jugador.granadas > 0:
-            granada = Granada(jugador.rect.centerx + (0.5*jugador.rect.size[0]*jugador.direccion),\
-            jugador.rect.top, jugador.direccion)#lanzar granadas
-            grupo_granadas.add(granada)
-            jugador.granadas -= 1
-            granada_fue_lanzada = True
-        if jugador.en_aire:
-            jugador.actualizar_accion(2) #saltar
-        if jugador_mov_izquierda or jugador_mov_derecha:
-            jugador.actualizar_accion(1)#correr
+        if jugador.vive:
+            if disparar:
+                jugador.disparar(Bala, grupo_balas)
+            elif granada and granada_fue_lanzada == False and jugador.granadas > 0:
+                granada = Granada(jugador.rect.centerx + (0.5*jugador.rect.size[0]*jugador.direccion),\
+                jugador.rect.top, jugador.direccion)#lanzar granadas
+                grupo_granadas.add(granada)
+                jugador.granadas -= 1
+                granada_fue_lanzada = True
+            if jugador.en_aire:
+                jugador.actualizar_accion(2) #saltar
+            if jugador_mov_izquierda or jugador_mov_derecha:
+                jugador.actualizar_accion(1)#correr
+            else:
+                jugador.actualizar_accion(0)#estar parado
+            deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel,grupo_agua)
+            fondo_deslizamiento -= deslizamiento_pantalla
+
+            print(jugador.rect.y)
         else:
-            jugador.actualizar_accion(0)#estar parado
-        deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel)
-        fondo_deslizamiento -= deslizamiento_pantalla
+            deslizamiento_pantalla = 0
+            if boton_reinicio.dibujo(pantalla):
+                fondo_deslizamiento = 0
 
-        print(jugador.rect.y)
-    
+                #borramos y volvemos a cargar el nivel
+                borrar_datos_grupos()
+                data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
+                mundo = Mundo()
+                jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
+
+
 
 
     for evento in pygame.event.get():
