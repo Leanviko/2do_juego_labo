@@ -71,7 +71,7 @@ class Personaje(pygame.sprite.Sprite):
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel,grupo_agua):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas):
 
         deslizamiento_pantalla = 0
         dx = 0
@@ -132,6 +132,11 @@ class Personaje(pygame.sprite.Sprite):
         if pygame.sprite.spritecollide(self, grupo_agua, False):
             self.salud -= 15
 
+        #colision jugador con los carteles de salida
+        nivel_completo = False
+        if pygame.sprite.spritecollide(self, grupo_salidas, False):
+            nivel_completo = True
+
         #chequear si el jugador cae del mapa
         if self.rect.top > ALTO_PANTALLA:
             self.salud = 0
@@ -155,7 +160,7 @@ class Personaje(pygame.sprite.Sprite):
             else:
                 deslizamiento_pantalla = 0
 
-        return deslizamiento_pantalla
+        return deslizamiento_pantalla, nivel_completo
 
 
     def disparar(self, Bala, grupo_balas):
@@ -166,7 +171,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas):
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
@@ -189,7 +194,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel,grupo_agua)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 

@@ -25,6 +25,7 @@ ROJO = variables["ROJO"]
 BLANCO = variables["BLANCO"]
 COLUMNAS = variables["COLUMNAS"]
 FILAS = variables["FILAS"]
+MAX_NIVELES = variables["MAX_NIVELES"]
 BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
 
 deslizamiento_pantalla = 0
@@ -138,7 +139,7 @@ while corriendo:
         jugador.dibujado(pantalla)
         
         for enemigo in grupo_enemigos:
-            enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel,grupo_agua)
+            enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel,grupo_agua,grupo_salidas)
             enemigo.update()
             enemigo.dibujado(pantalla)
         
@@ -175,10 +176,20 @@ while corriendo:
                 jugador.actualizar_accion(1)#correr
             else:
                 jugador.actualizar_accion(0)#estar parado
-            deslizamiento_pantalla = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel,grupo_agua)
-            fondo_deslizamiento -= deslizamiento_pantalla
+            deslizamiento_pantalla, nivel_completo = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel,grupo_agua,grupo_salidas)
 
-            print(jugador.rect.y)
+            fondo_deslizamiento -= deslizamiento_pantalla
+            
+            if nivel_completo:
+                nivel += 1
+                fondo_deslizamiento = 0
+                borrar_datos_grupos()
+
+                if nivel <= MAX_NIVELES:
+                    data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
+                    mundo = Mundo()
+                    jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
+
         else:
             deslizamiento_pantalla = 0
             if boton_reinicio.dibujo(pantalla):

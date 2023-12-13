@@ -10,5 +10,6 @@
     "BLANCO": [255,255,255],
     "VERDE": [0,255,0],
     "COLUMNAS" : 150,
-    "FILAS" : 16
+    "FILAS" : 16,
+    "MAX_NIVELES" : 3
 }
