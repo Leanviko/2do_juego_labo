@@ -30,7 +30,7 @@ BLOQUE_TAMANIO = ALTO_PANTALLA // FILAS
 
 deslizamiento_pantalla = 0
 fondo_deslizamiento = 0
-nivel = 1
+nivel = 3
 iniciar_juego = False
 
 def dibujo_fondo():
@@ -139,7 +139,7 @@ while corriendo:
         jugador.dibujado(pantalla)
         
         for enemigo in grupo_enemigos:
-            enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel,grupo_agua,grupo_salidas)
+            enemigo.ia(jugador, Bala, grupo_balas, mundo.lista_obstaculos,ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,mundo.largo_nivel,grupo_agua,grupo_salidas,pantalla)
             enemigo.update()
             enemigo.dibujado(pantalla)
         

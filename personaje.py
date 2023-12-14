@@ -41,7 +41,11 @@ class Personaje(pygame.sprite.Sprite):
         self.contador_movimiento = 0
         self.pausa_movimiento = False
         self.contador_pausa_movimiento = 0
-        self.vision = pygame.Rect(0,0,150,20)
+
+        if self.tipo == 'enemigo':
+            self.vision = pygame.Rect(0,0,150,20)
+        if self.tipo == 'jefe':
+            self.vision = pygame.Rect(0,0,500,90)
         
         #cargando todos los tipos de imagen
         animacion_tipos =['parado','corriendo','salto','muerte']
@@ -51,7 +55,7 @@ class Personaje(pygame.sprite.Sprite):
             num_de_frames = len(os.listdir(f'img/{tipo}/{animacion}'))
             for i in range(num_de_frames):
                 img = pygame.image.load(f'img/{tipo}/{animacion}/{i}.png').convert_alpha()
-                img = pygame.transform.scale_by(img, escala)
+                img = pygame.transform.scale(img, (img.get_width()*escala, img.get_height()*escala))
                 lista_temporal.append(img)
             self.animacion_lista.append(lista_temporal)
         
@@ -86,9 +90,9 @@ class Personaje(pygame.sprite.Sprite):
             self.flip = False
             self.direccion = 1
 
+        if self.tipo == 'jefe':
+            print(self.velocidad)
 
-        
-        #print(f'dx: {dx}')
 
         #salto
         if self.salto == True and self.en_aire == False:
@@ -113,7 +117,7 @@ class Personaje(pygame.sprite.Sprite):
                 dx = 0 # dejara de moverse en x
 
                 #si la IA colisiona con un muro cambia de dir
-                if self.tipo == "enemigo":
+                if self.tipo == "enemigo" or self.tipo == "jefe":
                     self.direccion *= -1
                     self.contador_movimiento = 0
 
@@ -171,18 +175,42 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,pantalla):
+        
         if self.vive and jugador.vive:
 
             #detenerse aleatoriamente
-            if self.pausa_movimiento == False and random.randint(1,200) == 1:
-                self.actualizar_accion(0)#parado
-                self.pausa_movimiento = True
-                self.contador_pausa_movimiento = 50
+            if self.tipo == "enemigo":
+                if self.pausa_movimiento == False and random.randint(1,200) == 1:
+                    self.actualizar_accion(0)#parado
+                    self.pausa_movimiento = True
+                    self.contador_pausa_movimiento = 50
+            if self.tipo == "jefe":
+                if self.pausa_movimiento == False and random.randint(1,2000) == 1:
+                    self.actualizar_accion(0)#parado
+                    self.pausa_movimiento = True
+                    self.contador_pausa_movimiento = 500
+                    print(self.contador_movimiento)
+
             #deternerse y disparar cuando ven al jugador
-            if self.vision.colliderect(jugador.rect):
+            if self.vision.colliderect(jugador.rect) and self.tipo == 'enemigo':
+
                 self.actualizar_accion(0)#parado
                 self.disparar(Bala, grupo_balas)
+
+            elif self.vision.colliderect(jugador.rect) and self.tipo == 'jefe': #cambio----------------------------------------
+
+                self.actualizar_accion(1)#parado
+                if self.rect.x - jugador.rect.x < 0:
+                    dx = self.velocidad
+                    self.flip = False
+                else:
+                    dx = -self.velocidad
+                    self.flip = True
+                
+                self.rect.x += dx
+                
+                #self.disparar(Bala, grupo_balas)
             else:
                 #asocio flip() con la dirección de movimiento
                 if self.pausa_movimiento == False:  
@@ -199,12 +227,23 @@ class Personaje(pygame.sprite.Sprite):
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 
                     #actualizar vision de los enemigos
-                    self.vision.center = (self.rect.centerx + 75 * self.direccion, self.rect.centery)
-                    #pygame.draw.rect(pantalla, ROJO, self.vision)
-
-                    if self.contador_movimiento > BLOQUE_TAMANIO:
-                        self.direccion *= -1
-                        self.contador_movimiento = 0
+                    if self.tipo == 'enemigo':
+                        self.vision.center = (self.rect.centerx + 75 * self.direccion, self.rect.centery)
+                        pygame.draw.rect(pantalla, ROJO, self.vision)
+                    if self.tipo == 'jefe':
+                        self.vision.center = (self.rect.centerx +150* self.direccion, self.rect.centery)
+                        pygame.draw.rect(pantalla, ROJO, self.vision)
+                    
+                    if self.tipo == "enemigo":
+                        if self.contador_movimiento > BLOQUE_TAMANIO:
+                            self.direccion *= -1
+                            self.contador_movimiento = 0
+                    if self.tipo == "jefe":
+                        if self.contador_movimiento > 200:
+                            self.direccion *= -1
+                            self.contador_movimiento = 0
+                    
+                        
                 else:
                     self.contador_pausa_movimiento -= 1
                     if self.contador_pausa_movimiento <= 0:
@@ -245,3 +284,4 @@ class Personaje(pygame.sprite.Sprite):
 
     def dibujado(self,pantalla):   
         pantalla.blit(pygame.transform.flip(self.imagen, self.flip, False), self.rect)
+        pygame.draw.rect(pantalla,ROJO,self.rect,2)

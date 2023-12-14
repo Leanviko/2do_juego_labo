@@ -38,6 +38,7 @@ class Bala(pygame.sprite.Sprite):
             if pygame.sprite.spritecollide(enemigo, grupo_balas, False):
                 if enemigo.vive:
                     enemigo.salud -= 10
+                    print(enemigo.salud)
                     self.kill()
 
 
@@ -105,6 +106,7 @@ class Granada(pygame.sprite.Sprite):
                 if abs(self.rect.centerx - enemigo.rect.centerx)< BLOQUE_TAMANIO //2 or \
                     abs(self.rect.centery - enemigo.rect.centery)< BLOQUE_TAMANIO //2:
                     enemigo.salud -= 50
+                    print(enemigo.salud)
 
 class Explosion(pygame.sprite.Sprite):
     def __init__(self,x,y,escala):
