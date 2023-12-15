@@ -48,7 +48,7 @@ class Personaje(pygame.sprite.Sprite):
             self.vision = pygame.Rect(0,0,500,90)
         
         #cargando todos los tipos de imagen
-        animacion_tipos =['parado','corriendo','salto','muerte']
+        animacion_tipos =['parado','corriendo','salto','muerte','disparo']
         for animacion in animacion_tipos:
             #resetea la lista temporal de imagenese
             lista_temporal = []
@@ -75,7 +75,7 @@ class Personaje(pygame.sprite.Sprite):
             self.cadencia_tiro -= 1
 
 
-    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas):
+    def movimiento(self, mov_izquierda, mov_derecha, lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL, fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,grupo_plataforma):
 
         deslizamiento_pantalla = 0
         dx = 0
@@ -90,8 +90,6 @@ class Personaje(pygame.sprite.Sprite):
             self.flip = False
             self.direccion = 1
 
-        if self.tipo == 'jefe':
-            print(self.velocidad)
 
 
         #salto
@@ -134,7 +132,10 @@ class Personaje(pygame.sprite.Sprite):
 
         #colision jugador con el agua radiactiva
         if pygame.sprite.spritecollide(self, grupo_agua, False):
-            self.salud -= 15
+            self.salud -= 5
+
+        if pygame.sprite.spritecollide(self, grupo_plataforma, False):
+            self.rect.bottom = grupo_plataforma.top
 
         #colision jugador con los carteles de salida
         nivel_completo = False
@@ -175,7 +176,7 @@ class Personaje(pygame.sprite.Sprite):
             #reducir municion
             self.municion -=1
 
-    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,pantalla):
+    def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,pantalla,grupo_plataforma):
         
         if self.vive and jugador.vive:
 
@@ -186,10 +187,10 @@ class Personaje(pygame.sprite.Sprite):
                     self.pausa_movimiento = True
                     self.contador_pausa_movimiento = 50
             if self.tipo == "jefe":
-                if self.pausa_movimiento == False and random.randint(1,2000) == 1:
+                if self.pausa_movimiento == False and random.randint(1,200) == 1:
                     self.actualizar_accion(0)#parado
                     self.pausa_movimiento = True
-                    self.contador_pausa_movimiento = 500
+                    self.contador_pausa_movimiento = 50
                     print(self.contador_movimiento)
 
             #deternerse y disparar cuando ven al jugador
@@ -222,7 +223,7 @@ class Personaje(pygame.sprite.Sprite):
                     #evitamos que la ia quiera moverse a ambos lados
                     ia_mover_izquierda = not ia_mover_derecha
 
-                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas)
+                    self.movimiento(ia_mover_izquierda, ia_mover_derecha,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,grupo_plataforma)
                     self.actualizar_accion(1)#correr
                     self.contador_movimiento += 1 #pasos hasta que de la vuelta
 

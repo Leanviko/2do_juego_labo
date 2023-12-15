@@ -28,8 +28,13 @@ caja_salud_img =pygame.image.load('img/iconos/caja_salud.png')
 caja_municion_img =pygame.image.load('img/iconos/caja_municion.png')
 caja_granada_img =pygame.image.load('img/iconos/caja_granada.png')
 
+#menus
+menu_pausa = pygame.image.load('img/menus/pausa.png')
+menu_configuracion_img = pygame.image.load('img/menus/configuracion.png')
+menu_niveles_img = pygame.image.load('img/menus/niveles.png')
+
 #bloques
-BLOQUES_TIPOS= 22
+BLOQUES_TIPOS= 23
 bloques_img_lista = []
 for i in range(BLOQUES_TIPOS):
     img = pygame.image.load(f'img/bloques/{i}.png')
@@ -45,3 +50,17 @@ item_cajas = {
     'Municion':caja_municion_img,
     'Granada':caja_granada_img,
 }
+
+grados_img_lista = []
+for i in range(8):
+    img = pygame.image.load(f'img/menus/grados/{i}.png')
+    grados_img_lista.append(img)
+
+
+estrellas_img_lista = []
+for i in range(4):
+    img = pygame.image.load(f'img/menus/estrellas/{i}_estrellas.png')
+    ancho = img.get_width()
+    alto = img.get_height()
+    img = pygame.transform.scale(img,(ancho*0.95,alto*0.7))
+    estrellas_img_lista.append(img)

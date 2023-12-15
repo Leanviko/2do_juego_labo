@@ -11,5 +11,5 @@
     "VERDE": [0,255,0],
     "COLUMNAS" : 150,
     "FILAS" : 16,
-    "MAX_NIVELES" : 3
+    "MAX_NIVELES" : 4
 }

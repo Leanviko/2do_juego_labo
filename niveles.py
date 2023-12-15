@@ -70,6 +70,9 @@ class Mundo():
                     elif bloque == 21: #nuevo
                         enemigo2 = Personaje('jefe',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,3,3,300,25,0)
                         grupo_enemigos.add(enemigo2)
+                    # elif bloque == 22:
+                    #     plataforma = Plataforma(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                    #     grupo_plataforma.add(plataforma)
                         
         return jugador, caja_salud
 
@@ -108,3 +111,20 @@ class Salida(pygame.sprite.Sprite):
     
     def update(self,deslizamiento_pantalla):
         self.rect.x += deslizamiento_pantalla
+
+# class Plataforma(pygame.sprite.Sprite):
+#     def __init__(self, imagen, x, y):
+#         pygame.sprite.Sprite.__init__(self)
+#         self.image = imagen
+#         self.image = pygame.transform.scale(self.image,(self.image.get_width()*4,self.image.get_height()))
+#         self.rect = self.image.get_rect()
+#         self.rect.center = (x+BLOQUE_TAMANIO//2, y+(BLOQUE_TAMANIO - self.image.get_height()))
+    
+#     def update(self,deslizamiento_pantalla,pantalla,jugador):
+#         self.rect.x += deslizamiento_pantalla
+#         pantalla.blit(self.image, self.rect)
+#         pygame.draw.rect(pantalla,ROJO,self.rect,2)
+
+#         # if self.rect.top.colliderect(jugador.rect.bottom):
+#         #     jugador.rect.bottom = self.rect.top
+
