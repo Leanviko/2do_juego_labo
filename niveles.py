@@ -28,7 +28,7 @@ class Mundo():
     def __init__(self):
         self.lista_obstaculos = []
 
-    def procesamiento_datos(self, datos, grupo_enemigos, grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas):
+    def procesamiento_datos(self, datos, grupo_enemigos, grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas,sonidos):
         self.largo_nivel = len(datos[0])#datos[0]:cantidad de columnas
         for y, fila in enumerate(datos):
             for x, bloque in enumerate(fila):
@@ -50,10 +50,10 @@ class Mundo():
                         decoracion = Decoracion(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
                         grupo_decoracion.add(decoracion)
                     elif bloque == 15: #jugador
-                        jugador = Personaje('jugador', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,5,100,25,5)
+                        jugador = Personaje('jugador', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,5,1000,25,5,sonidos)
                         caja_salud = BarraSalud(10,10,jugador.salud,jugador.salud_max)
                     elif bloque == 16:
-                        enemigo = Personaje('enemigo',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,2,35,25,0)
+                        enemigo = Personaje('enemigo',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,1.7,2,35,25,0,sonidos)
                         grupo_enemigos.add(enemigo)
                     elif bloque == 17:
                         caja_municion = CajaItem('Municion', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
@@ -62,13 +62,13 @@ class Mundo():
                         caja_granada = CajaItem('Granada', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
                         grupo_cajas_items.add(caja_granada)
                     elif bloque == 19:
-                        caja_salud = CajaItem('Salud', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
-                        grupo_cajas_items.add(caja_salud)
+                        caja_sal = CajaItem('Salud', x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
+                        grupo_cajas_items.add(caja_sal)
                     elif bloque == 20:
                         salida = Salida(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)
                         grupo_salidas.add(salida)
                     elif bloque == 21: #nuevo
-                        enemigo2 = Personaje('jefe',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,3,3,300,25,0)
+                        enemigo2 = Personaje('jefe',x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO,3,3,10,25,0,sonidos)
                         grupo_enemigos.add(enemigo2)
                     # elif bloque == 22:
                     #     plataforma = Plataforma(img, x*BLOQUE_TAMANIO, y*BLOQUE_TAMANIO)

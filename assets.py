@@ -2,6 +2,7 @@ import pygame
 import json
 
 pygame.font.init()
+pygame.mixer.init()
 
 with open("variables.json","r") as var:
     variables = json.load(var)
@@ -33,6 +34,16 @@ menu_pausa = pygame.image.load('img/menus/pausa.png')
 menu_configuracion_img = pygame.image.load('img/menus/configuracion.png')
 menu_niveles_img = pygame.image.load('img/menus/niveles.png')
 
+#menus
+game_over_img = pygame.image.load('img/mensajes/game_over.png')
+
+#fuentes
+fuente = pygame.font.Font(None, 36)
+
+# Tiempo total del temporizador (60 segundos)
+tiempo_total = 60
+tiempo_actual = tiempo_total
+
 #bloques
 BLOQUES_TIPOS= 23
 bloques_img_lista = []
@@ -43,6 +54,11 @@ for i in range(BLOQUES_TIPOS):
 
 #fuentes
 fuente = pygame.font.SysFont('Futura', 30)
+
+#sonidos
+salto = pygame.mixer.Sound('Sonidos/salto.wav')
+disparo = pygame.mixer.Sound('Sonidos/disparo.wav')
+sonidos ={"salto":salto, "disparo":disparo}
 
 #diccionario cajas
 item_cajas = {
@@ -64,3 +80,7 @@ for i in range(4):
     alto = img.get_height()
     img = pygame.transform.scale(img,(ancho*0.95,alto*0.7))
     estrellas_img_lista.append(img)
+
+volumenes = {"volumen_musica" :4,"volumen_sonido" : 4,"presionado" :False}
+
+estrellas = {"nivel_1" :1,"nivel_2" :1,"nivel_3" :2,"nivel_4" :3,} 

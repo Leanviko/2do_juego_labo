@@ -12,7 +12,7 @@ GRAVEDAD = variables["GRAVEDAD"]
 ROJO = variables["ROJO"]
 
 class Personaje(pygame.sprite.Sprite):
-    def __init__(self, tipo, x, y, escala, velocidad, salud, municion, granadas):
+    def __init__(self, tipo, x, y, escala, velocidad, salud, municion, granadas,sonidos):
         pygame.sprite.Sprite.__init__(self)
         self.tipo = tipo
         self.vive = True
@@ -41,6 +41,7 @@ class Personaje(pygame.sprite.Sprite):
         self.contador_movimiento = 0
         self.pausa_movimiento = False
         self.contador_pausa_movimiento = 0
+        self.cont = 0
 
         if self.tipo == 'enemigo':
             self.vision = pygame.Rect(0,0,150,20)
@@ -65,6 +66,10 @@ class Personaje(pygame.sprite.Sprite):
         self.rect.center = (x, y)
         self.ancho = self.imagen.get_width()
         self.alto = self.imagen.get_height()
+
+
+        self.disparo_sonido = sonidos["disparo"]
+        self.salto_sonido = sonidos["salto"]
 
     def update(self):
         self.animacion()
@@ -94,6 +99,7 @@ class Personaje(pygame.sprite.Sprite):
 
         #salto
         if self.salto == True and self.en_aire == False:
+            self.salto_sonido.play()
             self.velocidad_salto = -11
             self.salto = False
             self.en_aire = True
@@ -120,7 +126,7 @@ class Personaje(pygame.sprite.Sprite):
                     self.contador_movimiento = 0
 
             if bloque[1].colliderect(self.rect.x, self.rect.y + dy, self.ancho, self.alto):
-#---> no entiendo   #chekeamos si esta comenzando a saltar
+  #chekeamos si esta comenzando a saltar
                 if self.velocidad_salto < 0:
                     self.velocidad_salto = 0
                     dy = bloque[1].bottom - self.rect.top
@@ -156,7 +162,7 @@ class Personaje(pygame.sprite.Sprite):
         self.rect.x += dx
         self.rect.y += int(dy)
         #actualizo el paneo dependiendo la posicion
-#Estudiar--->        
+       
         if self.tipo == "jugador":
             if self.salud > 0:
                 if (self.rect.right > ANCHO_PANTALLA - DESLIZAR_HORIZONTAL and fondo_deslizamiento<(largo_nivel*BLOQUE_TAMANIO)-ANCHO_PANTALLA) or (self.rect.left < DESLIZAR_HORIZONTAL and fondo_deslizamiento> abs(dx)):
@@ -171,9 +177,14 @@ class Personaje(pygame.sprite.Sprite):
     def disparar(self, Bala, grupo_balas):
         if self.cadencia_tiro == 0 and self.municion > 0:
             self.cadencia_tiro = 20
-            bala = Bala(self.rect.centerx + (0.8* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion)
-            grupo_balas.add(bala)
+            if self.tipo == "enemigo" or self.tipo == "jugador":
+                bala = Bala(self.rect.centerx + (0.8* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion, 1)
+                grupo_balas.add(bala)
+            if self.tipo == "jefe":
+                bala = Bala(self.rect.centerx + (0.8* self.rect.size[0]*self.direccion), self.rect.centery, self.direccion, 3)
+                grupo_balas.add(bala)
             #reducir municion
+            self.disparo_sonido.play()
             self.municion -=1
 
     def ia(self, jugador, Bala, grupo_balas,lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,deslizamiento_pantalla,fondo_deslizamiento,largo_nivel,grupo_agua,grupo_salidas,pantalla,grupo_plataforma):
@@ -192,6 +203,13 @@ class Personaje(pygame.sprite.Sprite):
                     self.pausa_movimiento = True
                     self.contador_pausa_movimiento = 50
                     print(self.contador_movimiento)
+
+
+            
+            if self.tipo == "jefe":    
+                if self.rect.colliderect(jugador.rect):
+
+                        jugador.salud -= 5
 
             #deternerse y disparar cuando ven al jugador
             if self.vision.colliderect(jugador.rect) and self.tipo == 'enemigo':
@@ -233,7 +251,7 @@ class Personaje(pygame.sprite.Sprite):
                         pygame.draw.rect(pantalla, ROJO, self.vision)
                     if self.tipo == 'jefe':
                         self.vision.center = (self.rect.centerx +150* self.direccion, self.rect.centery)
-                        pygame.draw.rect(pantalla, ROJO, self.vision)
+                        #pygame.draw.rect(pantalla, ROJO, self.vision)
                     
                     if self.tipo == "enemigo":
                         if self.contador_movimiento > BLOQUE_TAMANIO:
@@ -285,4 +303,4 @@ class Personaje(pygame.sprite.Sprite):
 
     def dibujado(self,pantalla):   
         pantalla.blit(pygame.transform.flip(self.imagen, self.flip, False), self.rect)
-        pygame.draw.rect(pantalla,ROJO,self.rect,2)
+        #pygame.draw.rect(pantalla,ROJO,self.rect,2)

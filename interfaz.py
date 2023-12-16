@@ -75,7 +75,7 @@ def funcion_menu_pausa(pantalla, img, x, y, pos_x,pos_y, estados):
 
 
     
-def menu_configuracion(pantalla, img, x, y, pos_x,pos_y, estados,grados_img_lista,volumenes):
+def menu_configuracion(pantalla, img, x, y, pos_x,pos_y, estados,grados_img_lista,volumenes,sonidos):
     img = img.convert_alpha()
     img_rect = img.get_rect()
     img_rect.center = (x, y)
@@ -93,6 +93,7 @@ def menu_configuracion(pantalla, img, x, y, pos_x,pos_y, estados,grados_img_list
             if volumenes["volumen_musica"]  > 7:
                 volumenes["volumen_musica"]  = 7
             volumenes["presionado"] = True
+            sonidos["disparo"].play()
     
     if (pos_x > 293 and pos_x< 331) and (pos_y > 286 and pos_y<327):
         if pygame.mouse.get_pressed()[0] and volumenes["presionado"] == False:
@@ -100,6 +101,7 @@ def menu_configuracion(pantalla, img, x, y, pos_x,pos_y, estados,grados_img_list
             if volumenes["volumen_musica"]  < 0:
                 volumenes["volumen_musica"]  = 0
             volumenes["presionado"] = True
+            sonidos["disparo"].play()
         
     if not(pygame.mouse.get_pressed()[0]):
         volumenes["presionado"] = False
@@ -135,12 +137,15 @@ def menu_configuracion(pantalla, img, x, y, pos_x,pos_y, estados,grados_img_list
             if volumenes["volumen_sonido"]  > 7:
                 volumenes["volumen_sonido"]  = 7
             volumenes["presionado"] = True
+            #sonidos["disparo"].play()
+
     if (pos_x > 293 and pos_x< 331) and (pos_y > 357 and pos_y< 400):
         if pygame.mouse.get_pressed()[0] and volumenes["presionado"] == False:
             volumenes["volumen_sonido"]  -= 1
             if volumenes["volumen_sonido"]  < 0:
                 volumenes["volumen_sonido"]  = 0
             volumenes["presionado"] = True
+            #sonidos["disparo"].play()
         
     if not(pygame.mouse.get_pressed()[0]):
         volumenes["presionado"] = False

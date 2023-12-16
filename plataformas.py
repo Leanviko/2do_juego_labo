@@ -60,11 +60,12 @@ pygame.font.init()
 pantalla = pygame.display.set_mode((ANCHO_PANTALLA,ALTO_PANTALLA))
 pygame.display.set_caption('2do juego')
 reloj = pygame.time.Clock()
+pygame.mixer.init()
+
+sonidos["salto"].set_volume(volumenes["volumen_sonido"])
 
 
-volumenes = {"volumen_musica" :4,"volumen_sonido" : 4,"presionado" :False}
 
-estrellas = {"nivel_1" :1,"nivel_2" :1,"nivel_3" :2,"nivel_4" :3,} 
 
 deslizamiento_pantalla = 0
 fondo_deslizamiento = 0
@@ -102,15 +103,14 @@ grupo_plataforma = pygame.sprite.Group()
 data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
 
 mundo = Mundo()
-jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua, grupo_salidas)
+jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua, grupo_salidas,sonidos)
 
 
+datos_pantalla = {"puntaje" : 0,"tiempo_completado":0}
 
 
+estados = {"corriendo" :False,"iniciar_juego" : False,"partida_perdida" : False,"pausa_juego" :False,"configuracion_pantalla" : False,"ranking_pantalla" : False, "seleccion_nivel_pantalla" : False,"menu_pausa_principal" : True,"presionado" :False}
 
-estados = {"iniciar_juego" : False,"partida_perdida" : False,"pausa_juego" :False,"configuracion_pantalla" : False,"ranking_pantalla" : False, "seleccion_nivel_pantalla" : False,"menu_pausa_principal" : True,"presionado" :False}
-
-#boton_pausa = Boton(ANCHO_PANTALLA//2,ALTO_PANTALLA//2,)
 
 
 
@@ -118,8 +118,8 @@ estados = {"iniciar_juego" : False,"partida_perdida" : False,"pausa_juego" :Fals
 
 
 #* bucle principal -----------------------------
-corriendo = True
-while corriendo:
+estados["corriendo"] = True
+while estados["corriendo"]:
     pos_x,pos_y = pygame.mouse.get_pos()
     print(nivel)
     
@@ -145,7 +145,7 @@ while corriendo:
                     funcion_menu_pausa(pantalla, menu_pausa, ANCHO_PANTALLA//2, ALTO_PANTALLA//2,pos_x,pos_y, estados)
 
                 if estados["configuracion_pantalla"] == True:
-                        menu_configuracion(pantalla, menu_configuracion_img, ANCHO_PANTALLA//2, ALTO_PANTALLA//2,pos_x,pos_y, estados,grados_img_lista,volumenes)
+                        menu_configuracion(pantalla, menu_configuracion_img, ANCHO_PANTALLA//2, ALTO_PANTALLA//2,pos_x,pos_y, estados,grados_img_lista,volumenes,sonidos)
                 if estados["seleccion_nivel_pantalla"]:
                     
                     nivel_nuevo = menu_niveles(pantalla, menu_niveles_img, ANCHO_PANTALLA//2, ALTO_PANTALLA//2, pos_x, pos_y, estados, estrellas_img_lista, estrellas, nivel)
@@ -158,7 +158,7 @@ while corriendo:
                         if nivel <= MAX_NIVELES:
                             data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
                             mundo = Mundo()
-                            jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
+                            jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas,sonidos)
                     
                 if estados["ranking_pantalla"]:
                     pass
@@ -227,6 +227,9 @@ while corriendo:
                     deslizamiento_pantalla, nivel_completo = jugador.movimiento(jugador_mov_izquierda,jugador_mov_derecha, mundo.lista_obstaculos, ANCHO_PANTALLA, DESLIZAR_HORIZONTAL,fondo_deslizamiento,mundo.largo_nivel,grupo_agua,grupo_salidas,grupo_plataforma)
 
                     fondo_deslizamiento -= deslizamiento_pantalla
+
+
+                    temporizador_pantalla(pantalla, fuente, tiempo_total,estados,game_over_img,ANCHO_PANTALLA//2,ALTO_PANTALLA//2,datos_pantalla)
                     
                     if nivel_completo:
                         nivel += 1
@@ -236,7 +239,7 @@ while corriendo:
                         if nivel <= MAX_NIVELES:
                             data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
                             mundo = Mundo()
-                            jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
+                            jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas,sonidos)
 
                 else:
                     deslizamiento_pantalla = 0
@@ -247,7 +250,7 @@ while corriendo:
                         borrar_datos_grupos()
                         data_niveles = cargar_niveles(FILAS,COLUMNAS,nivel)
                         mundo = Mundo()
-                        jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas)
+                        jugador, caja_salud = mundo.procesamiento_datos(data_niveles,grupo_enemigos,grupo_cajas_items,grupo_decoracion, grupo_agua,grupo_salidas,sonidos)
 
 
 
@@ -255,7 +258,7 @@ while corriendo:
     for evento in pygame.event.get():
         
         if evento.type == pygame.QUIT:
-            corriendo = False
+            estados["corriendo"] = False
         
         #movimiento
         if evento.type == pygame.KEYDOWN:

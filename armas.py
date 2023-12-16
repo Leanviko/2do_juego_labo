@@ -10,10 +10,11 @@ ANCHO_PANTALLA = variables["ANCHO_PANTALLA"]
 GRAVEDAD = variables["GRAVEDAD"]
 
 class Bala(pygame.sprite.Sprite):
-    def __init__(self,x,y,direccion):
+    def __init__(self,x,y,direccion,escala):
         pygame.sprite.Sprite.__init__(self)
         self.velocidad = 10
         self.image = bala_img.convert_alpha()
+        self.image = pygame.transform.scale_by(self.image,escala)
         self.rect = self.image.get_rect()
         self.rect.center = (x, y)
         self.direccion = direccion
